@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hi</title>
+    <title>Kubus Pecah Melingkar - Three.js</title>
     <style>
         body { 
             margin: 0; 
@@ -25,7 +25,7 @@
 </head>
 <body>
 
-    <div id="info">Klik/Ketuk kubus untuk memecahkannya!</div>
+    <div id="info">Klik/Ketuk kubus untuk memecahkannya menjadi bentuk lingkaran!</div>
 
     <!-- Import Three.js via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -40,7 +40,7 @@
         document.body.appendChild(renderer.domElement);
 
         // Pencahayaan
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
         const pointLight = new THREE.PointLight(0xffffff, 1);
         pointLight.position.set(10, 10, 10);
@@ -54,7 +54,6 @@
 
         camera.position.z = 6;
 
-        // Array untuk menyimpan pecahan kubus kecil
         let smallCubes = [];
         let isExploded = false;
 
@@ -63,56 +62,54 @@
         const mouse = new THREE.Vector2();
 
         function onClick(event) {
-            if (isExploded) return; // Jika sudah pecah, abaikan klik selanjutnya
+            if (isExploded) return;
 
-            // Hitung posisi kursor/sentuhan dalam koordinat WebGL (-1 sampai +1)
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObject(mainCube);
 
-            // Jika kubus utama diklik
             if (intersects.length > 0) {
-                explodeCube();
+                explodeCubeInCircle();
             }
         }
 
-        // Jalankan event klik / tap
         window.addEventListener('click', onClick);
 
-        // 4. LOGIKA PECAH KUBUS MENJADI 7
-        function explodeCube() {
+        // 4. LOGIKA PECAH BERBENTUK LINGKARAN & TETAP DI SEKITAR
+        function explodeCubeInCircle() {
             isExploded = true;
             
-            // Ambil posisi terakhir kubus utama
             const originPosition = mainCube.position.clone();
-            
-            // Hapus kubus utama dari layar
             scene.remove(mainCube);
 
-            // Warna-warni untuk pecahan kecil (opsional agar menarik)
+            const count = 7; // Jumlah pecahan
+            const radius = 2.2; // Jarak radius lingkaran (tetap di sekitar)
             const colors = [0xff5555, 0x55ff55, 0x5555ff, 0xffff55, 0xff55ff, 0x55ffff, 0xffa500];
 
-            // Buat 7 kubus kecil
-            for (let i = 0; i < 7; i++) {
-                const smallGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+            for (let i = 0; i < count; i++) {
+                const smallGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
                 const smallMat = new THREE.MeshStandardMaterial({ color: colors[i] });
                 const cube = new THREE.Mesh(smallGeo, smallMat);
 
-                // Set posisi awal di pusat kubus utama
+                // Hitung sudut lingkaran untuk tiap pecahan (dalam radian)
+                const angle = (i / count) * Math.PI * 2;
+
+                // Tentukan target posisi melingkar menggunakan Sinus & Kosinus
+                const targetX = originPosition.x + Math.cos(angle) * radius;
+                const targetY = originPosition.y + Math.sin(angle) * radius;
+                const targetZ = originPosition.z;
+
+                // Set posisi awal tepat di tengah sebelum bergerak mekar ke posisi lingkaran
                 cube.position.copy(originPosition);
 
-                // Buat arah lemparan acak ke segala arah
+                // Simpan target posisi & rotasi untuk dianimasikan
                 cube.userData = {
-                    velocity: new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.15,
-                        (Math.random() - 0.5) * 0.15,
-                        (Math.random() - 0.5) * 0.15
-                    ),
+                    targetPosition: new THREE.Vector3(targetX, targetY, targetZ),
                     rotationSpeed: {
-                        x: Math.random() * 0.1,
-                        y: Math.random() * 0.1
+                        x: (Math.random() - 0.5) * 0.04,
+                        y: (Math.random() - 0.5) * 0.04
                     }
                 };
 
@@ -120,7 +117,7 @@
                 smallCubes.push(cube);
             }
 
-            document.getElementById('info').innerText = "Berhasil dipecahkan!";
+            document.getElementById('info').innerText = "Berhasil dipecahkan secara melingkar!";
         }
 
         // 5. ANIMASI (LOOP)
@@ -128,14 +125,17 @@
             requestAnimationFrame(animate);
 
             if (!isExploded) {
-                // Putar kubus utama jika belum diklik
+                // Putar kubus utama saat belum diklik
                 mainCube.rotation.x += 0.01;
                 mainCube.rotation.y += 0.01;
             } else {
-                // Animasikan pergerakan 7 kubus kecil menyebar keluar
+                // Animasikan pecahan kubus agar bergerak halus (lerp) menuju bentuk lingkaran
                 smallCubes.forEach(cube => {
-                    cube.position.add(cube.userData.velocity); // Gerak menyebar
-                    cube.rotation.x += cube.userData.rotationSpeed.x; // Berputar sendiri
+                    // lerp (linear interpolation) membuat gerakan "mekar" yang sangat halus dan berhenti di target posisi
+                    cube.position.lerp(cube.userData.targetPosition, 0.08);
+
+                    // Kubus kecil tetap berputar pelan di posisinya masing-masing
+                    cube.rotation.x += cube.userData.rotationSpeed.x;
                     cube.rotation.y += cube.userData.rotationSpeed.y;
                 });
             }
@@ -145,7 +145,7 @@
 
         animate();
 
-        // Responsive saat ukuran window diubah
+        // Responsive window resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
