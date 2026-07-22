@@ -2,41 +2,155 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Website Three.js Saya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hi</title>
     <style>
-        body { margin: 0; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #111; 
+            font-family: Arial, sans-serif;
+        }
         canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <!-- Import Three.js langsung lewat CDN -->
+
+    <div id="info">Klik/Ketuk kubus untuk memecahkannya!</div>
+
+    <!-- Import Three.js via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
+
     <script>
-        // Kode Three.js kamu ditulis di sini
+        // 1. SETUP SCENE, CAMERA, & RENDERER
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Buat Kubus 3D
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        // Pencahayaan
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
 
-        camera.position.z = 5;
+        // 2. BUAT KUBUS UTAMA
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshStandardMaterial({ color: 0x00ff88, roughness: 0.3 });
+        let mainCube = new THREE.Mesh(geometry, material);
+        scene.add(mainCube);
 
-        // Animasi Putar
+        camera.position.z = 6;
+
+        // Array untuk menyimpan pecahan kubus kecil
+        let smallCubes = [];
+        let isExploded = false;
+
+        // 3. RAYCASTER UNTUK DETEKSI KLIK/KETUK
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onClick(event) {
+            if (isExploded) return; // Jika sudah pecah, abaikan klik selanjutnya
+
+            // Hitung posisi kursor/sentuhan dalam koordinat WebGL (-1 sampai +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(mainCube);
+
+            // Jika kubus utama diklik
+            if (intersects.length > 0) {
+                explodeCube();
+            }
+        }
+
+        // Jalankan event klik / tap
+        window.addEventListener('click', onClick);
+
+        // 4. LOGIKA PECAH KUBUS MENJADI 7
+        function explodeCube() {
+            isExploded = true;
+            
+            // Ambil posisi terakhir kubus utama
+            const originPosition = mainCube.position.clone();
+            
+            // Hapus kubus utama dari layar
+            scene.remove(mainCube);
+
+            // Warna-warni untuk pecahan kecil (opsional agar menarik)
+            const colors = [0xff5555, 0x55ff55, 0x5555ff, 0xffff55, 0xff55ff, 0x55ffff, 0xffa500];
+
+            // Buat 7 kubus kecil
+            for (let i = 0; i < 7; i++) {
+                const smallGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+                const smallMat = new THREE.MeshStandardMaterial({ color: colors[i] });
+                const cube = new THREE.Mesh(smallGeo, smallMat);
+
+                // Set posisi awal di pusat kubus utama
+                cube.position.copy(originPosition);
+
+                // Buat arah lemparan acak ke segala arah
+                cube.userData = {
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.15,
+                        (Math.random() - 0.5) * 0.15,
+                        (Math.random() - 0.5) * 0.15
+                    ),
+                    rotationSpeed: {
+                        x: Math.random() * 0.1,
+                        y: Math.random() * 0.1
+                    }
+                };
+
+                scene.add(cube);
+                smallCubes.push(cube);
+            }
+
+            document.getElementById('info').innerText = "Berhasil dipecahkan!";
+        }
+
+        // 5. ANIMASI (LOOP)
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+
+            if (!isExploded) {
+                // Putar kubus utama jika belum diklik
+                mainCube.rotation.x += 0.01;
+                mainCube.rotation.y += 0.01;
+            } else {
+                // Animasikan pergerakan 7 kubus kecil menyebar keluar
+                smallCubes.forEach(cube => {
+                    cube.position.add(cube.userData.velocity); // Gerak menyebar
+                    cube.rotation.x += cube.userData.rotationSpeed.x; // Berputar sendiri
+                    cube.rotation.y += cube.userData.rotationSpeed.y;
+                });
+            }
+
             renderer.render(scene, camera);
         }
+
         animate();
+
+        // Responsive saat ukuran window diubah
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
