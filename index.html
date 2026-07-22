@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kubus Pecah Melingkar - Three.js</title>
+    <title>Transformasi Kubus ke Low Poly Sphere - Three.js</title>
     <style>
         body { 
             margin: 0; 
@@ -25,7 +25,7 @@
 </head>
 <body>
 
-    <div id="info">Klik/Ketuk kubus untuk memecahkannya menjadi bentuk lingkaran!</div>
+    <div id="info">Klik/Ketuk kubus untuk memecahkannya!</div>
 
     <!-- Import Three.js via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -39,53 +39,71 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Pencahayaan
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // Pencahayaan (Menggunakan Flat Shading untuk mempertegas efek Low Poly)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 1);
+        const pointLight = new THREE.PointLight(0xffffff, 1.2);
         pointLight.position.set(10, 10, 10);
         scene.add(pointLight);
 
-        // 2. BUAT KUBUS UTAMA
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff88, roughness: 0.3 });
-        let mainCube = new THREE.Mesh(geometry, material);
+        // 2. OBJEK Awal: KUBUS UTAMA
+        const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
+        const cubeMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, roughness: 0.3 });
+        let mainCube = new THREE.Mesh(cubeGeo, cubeMat);
         scene.add(mainCube);
+
+        // 3. OBJEK TUJUAN: LOW POLY SPHERE (Awalnya tersembunyi)
+        // IcosahedronGeometry dengan detail 1 menghasilkan bentuk Low Poly sempurna
+        const sphereGeo = new THREE.IcosahedronGeometry(1.5, 1);
+        const sphereMat = new THREE.MeshStandardMaterial({ 
+            color: 0xff0055, 
+            flatShading: true, // Efek khas Low Poly!
+            roughness: 0.2 
+        });
+        const lowPolySphere = new THREE.Mesh(sphereGeo, sphereMat);
+        lowPolySphere.visible = false; // Sembunyikan dulu
+        scene.add(lowPolySphere);
 
         camera.position.z = 6;
 
+        // State / Status Objek
         let smallCubes = [];
-        let isExploded = false;
+        let state = 'CUBE'; // Pilihan status: 'CUBE', 'EXPLODED', 'MERGING', 'SPHERE'
 
-        // 3. RAYCASTER UNTUK DETEKSI KLIK/KETUK
+        // 4. RAYCASTER & INTERAKSI KLIK
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
         function onClick(event) {
-            if (isExploded) return;
-
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(mainCube);
 
-            if (intersects.length > 0) {
-                explodeCubeInCircle();
+            // TAHAP 1: Klik Kubus Utama -> Pecah
+            if (state === 'CUBE') {
+                const intersects = raycaster.intersectObject(mainCube);
+                if (intersects.length > 0) {
+                    explodeCubeInCircle();
+                }
+            } 
+            // TAHAP 2: Klik Salah Satu Pecahan -> Menyatu ke Tengah
+            else if (state === 'EXPLODED') {
+                const intersects = raycaster.intersectObjects(smallCubes);
+                if (intersects.length > 0) {
+                    mergeToSphere();
+                }
             }
         }
 
         window.addEventListener('click', onClick);
 
-        // 4. LOGIKA PECAH BERBENTUK LINGKARAN & TETAP DI SEKITAR
+        // 5. FUNGSI MEMECAH KUBUS
         function explodeCubeInCircle() {
-            isExploded = true;
-            
-            const originPosition = mainCube.position.clone();
+            state = 'EXPLODED';
             scene.remove(mainCube);
 
-            const count = 7; // Jumlah pecahan
-            const radius = 2.2; // Jarak radius lingkaran (tetap di sekitar)
+            const count = 7;
+            const radius = 2.2;
             const colors = [0xff5555, 0x55ff55, 0x5555ff, 0xffff55, 0xff55ff, 0x55ffff, 0xffa500];
 
             for (let i = 0; i < count; i++) {
@@ -93,20 +111,14 @@
                 const smallMat = new THREE.MeshStandardMaterial({ color: colors[i] });
                 const cube = new THREE.Mesh(smallGeo, smallMat);
 
-                // Hitung sudut lingkaran untuk tiap pecahan (dalam radian)
                 const angle = (i / count) * Math.PI * 2;
+                const targetX = Math.cos(angle) * radius;
+                const targetY = Math.sin(angle) * radius;
 
-                // Tentukan target posisi melingkar menggunakan Sinus & Kosinus
-                const targetX = originPosition.x + Math.cos(angle) * radius;
-                const targetY = originPosition.y + Math.sin(angle) * radius;
-                const targetZ = originPosition.z;
+                cube.position.set(0, 0, 0);
 
-                // Set posisi awal tepat di tengah sebelum bergerak mekar ke posisi lingkaran
-                cube.position.copy(originPosition);
-
-                // Simpan target posisi & rotasi untuk dianimasikan
                 cube.userData = {
-                    targetPosition: new THREE.Vector3(targetX, targetY, targetZ),
+                    targetPosition: new THREE.Vector3(targetX, targetY, 0),
                     rotationSpeed: {
                         x: (Math.random() - 0.5) * 0.04,
                         y: (Math.random() - 0.5) * 0.04
@@ -117,27 +129,67 @@
                 smallCubes.push(cube);
             }
 
-            document.getElementById('info').innerText = "Berhasil dipecahkan secara melingkar!";
+            document.getElementById('info').innerText = "Ketuk salah satu pecahan untuk menyatukannya menjadi bola!";
         }
 
-        // 5. ANIMASI (LOOP)
+        // 6. FUNGSI MENYATUKAN PECAHAN
+        function mergeToSphere() {
+            state = 'MERGING';
+            document.getElementById('info').innerText = "Menyatukan pecahan...";
+            
+            // Ubah target semua pecahan kembali ke pusat (0, 0, 0)
+            smallCubes.forEach(cube => {
+                cube.userData.targetPosition = new THREE.Vector3(0, 0, 0);
+            });
+        }
+
+        // 7. ANIMASI LOOP
         function animate() {
             requestAnimationFrame(animate);
 
-            if (!isExploded) {
-                // Putar kubus utama saat belum diklik
+            // Logika Animasi Berdasarkan Status
+            if (state === 'CUBE') {
                 mainCube.rotation.x += 0.01;
                 mainCube.rotation.y += 0.01;
-            } else {
-                // Animasikan pecahan kubus agar bergerak halus (lerp) menuju bentuk lingkaran
+            } 
+            else if (state === 'EXPLODED') {
                 smallCubes.forEach(cube => {
-                    // lerp (linear interpolation) membuat gerakan "mekar" yang sangat halus dan berhenti di target posisi
                     cube.position.lerp(cube.userData.targetPosition, 0.08);
-
-                    // Kubus kecil tetap berputar pelan di posisinya masing-masing
                     cube.rotation.x += cube.userData.rotationSpeed.x;
                     cube.rotation.y += cube.userData.rotationSpeed.y;
                 });
+            } 
+            else if (state === 'MERGING') {
+                let closeCount = 0;
+                
+                smallCubes.forEach(cube => {
+                    // Tarik pecahan kembali ke pusat (0,0,0)
+                    cube.position.lerp(cube.userData.targetPosition, 0.12);
+                    cube.rotation.x += 0.05;
+                    cube.rotation.y += 0.05;
+
+                    // Hitung berapa pecahan yang sudah sangat dekat dengan pusat
+                    if (cube.position.distanceTo(new THREE.Vector3(0, 0, 0)) < 0.1) {
+                        closeCount++;
+                    }
+                });
+
+                // Jika SEMUA pecahan sudah tiba di tengah, munculkan Low Poly Sphere!
+                if (closeCount === smallCubes.length) {
+                    // Hapus pecahan kubus dari scene
+                    smallCubes.forEach(cube => scene.remove(cube));
+                    smallCubes = [];
+
+                    // Tampilkan Low Poly Sphere
+                    lowPolySphere.visible = true;
+                    state = 'SPHERE';
+                    document.getElementById('info').innerText = "Selesai! Berubah menjadi Low Poly Sphere.";
+                }
+            } 
+            else if (state === 'SPHERE') {
+                // Animasikan bola low poly agar terus berputar
+                lowPolySphere.rotation.x += 0.01;
+                lowPolySphere.rotation.y += 0.015;
             }
 
             renderer.render(scene, camera);
@@ -145,7 +197,7 @@
 
         animate();
 
-        // Responsive window resize
+        // Responsive Resizing
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
