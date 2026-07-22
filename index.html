@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morphing 3D - Three.js</title>
+    <title>3D Blood Red Morphing - Three.js</title>
     <style>
         body { 
             margin: 0; 
             overflow: hidden; 
-            background-color: #111; 
+            background-color: #050505; /* Background hitam pekat agar warna merah darah lebih menonjol */
             font-family: Arial, sans-serif;
+            user-select: none;
         }
         canvas { display: block; }
         #info {
@@ -17,19 +18,21 @@
             top: 20px;
             width: 100%;
             text-align: center;
-            color: white;
+            color: #ff4d4d;
             font-size: 18px;
             pointer-events: none;
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0px 2px 10px rgba(139, 0, 0, 0.8);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div id="info">Ketuk KUBUS untuk memecahkannya!</div>
+    <div id="info">Ketuk KUBUS untuk memecahkannya! (Geser layar untuk memutar sudut 3D)</div>
 
-    <!-- Import Three.js via CDN -->
+    <!-- Import Three.js dan OrbitControls via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
         // 1. SETUP SCENE, CAMERA, & RENDERER
@@ -39,44 +42,71 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        // 2. TAMBAHKAN ORBIT CONTROLS (AGAR BISA DIGESER 3D-NYA)
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Rotasi terasa halus/halus saat digeser
+        controls.dampingFactor = 0.05;
+
+        // PENCAHAYAAN
+        const ambientLight = new THREE.AmbientLight(0x330000, 0.8); // Cahaya redup merah
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 1.2);
+
+        const pointLight = new THREE.PointLight(0xff1a1a, 1.5, 50); // Cahaya sorot merah terang
         pointLight.position.set(10, 10, 10);
         scene.add(pointLight);
 
-        // 2. OBJEK KUBUS UTAMA
+        const fillLight = new THREE.PointLight(0x800000, 1, 50);
+        fillLight.position.set(-10, -10, -10);
+        scene.add(fillLight);
+
+        // WARNA MERAH DARAH (HEX)
+        const bloodRedColor = 0x8b0000;
+        const darkBloodColor = 0x550000;
+
+        // 3. OBJEK KUBUS UTAMA (MERAH DARAH)
         const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
-        const cubeMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, roughness: 0.3 });
+        const cubeMat = new THREE.MeshStandardMaterial({ 
+            color: bloodRedColor, 
+            roughness: 0.2, 
+            metalness: 0.3 
+        });
         let mainCube = new THREE.Mesh(cubeGeo, cubeMat);
         scene.add(mainCube);
 
-        // 3. OBJEK LOW POLY SPHERE
+        // 4. OBJEK LOW POLY SPHERE (MERAH DARAH)
         const sphereGeo = new THREE.IcosahedronGeometry(1.5, 1);
         const sphereMat = new THREE.MeshStandardMaterial({ 
-            color: 0xff0055, 
-            flatShading: true, 
-            roughness: 0.2 
+            color: bloodRedColor, 
+            flatShading: true, // Efek pecahan/muka datar Low Poly
+            roughness: 0.1,
+            metalness: 0.4
         });
         const lowPolySphere = new THREE.Mesh(sphereGeo, sphereMat);
-        lowPolySphere.visible = false; // Sembunyikan di awal
+        lowPolySphere.visible = false;
         scene.add(lowPolySphere);
 
         camera.position.z = 6;
 
-        // Vektor Skala untuk Morphing
+        // Vektor Skala
         const scaleOne = new THREE.Vector3(1, 1, 1);
         const scaleZero = new THREE.Vector3(0, 0, 0);
 
-        // Status Aplikasi: 'CUBE', 'EXPLODED', 'MERGING', 'MORPH_TO_SPHERE', 'SPHERE', 'MORPH_TO_CUBE'
         let state = 'CUBE'; 
         let smallCubes = [];
         
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        // 4. INTERAKSI KLIK
-        window.addEventListener('click', (event) => {
+        // Variabel untuk membedakan antara "drag/geser camera" dan "klik/ketuk"
+        let isDragging = false;
+        window.addEventListener('mousedown', () => isDragging = false);
+        window.addEventListener('mousemove', () => isDragging = true);
+
+        // 5. INTERAKSI KLIK / TOUCH
+        window.addEventListener('pointerup', (event) => {
+            // Jika user sedang menggeser 3D (drag), jangan picu animasi pecah/morph
+            if (isDragging) return;
+
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -95,19 +125,22 @@
             }
         });
 
-        // TAHAP A: MELEDAK
+        // FUNGSI 1: MELEDAK
         function explodeCube() {
             state = 'EXPLODED';
             mainCube.visible = false;
-            document.getElementById('info').innerText = "Ketuk pecahan untuk morphing menjadi bola!";
+            document.getElementById('info').innerText = "Ketuk pecahan untuk morphing menjadi bola merah!";
 
             const count = 7;
             const radius = 2.2;
-            const colors = [0xff5555, 0x55ff55, 0x5555ff, 0xffff55, 0xff55ff, 0x55ffff, 0xffa500];
 
             for (let i = 0; i < count; i++) {
                 const smallGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-                const smallMat = new THREE.MeshStandardMaterial({ color: colors[i] });
+                // Kombinasi variasi warna merah darah pada pecahan
+                const smallMat = new THREE.MeshStandardMaterial({ 
+                    color: (i % 2 === 0) ? bloodRedColor : darkBloodColor,
+                    roughness: 0.2
+                });
                 const cube = new THREE.Mesh(smallGeo, smallMat);
 
                 const angle = (i / count) * Math.PI * 2;
@@ -124,7 +157,7 @@
             }
         }
 
-        // TAHAP B: MULAI MENYATU
+        // FUNGSI 2: MENYATU
         function mergeCubes() {
             state = 'MERGING';
             document.getElementById('info').innerText = "Morphing...";
@@ -133,23 +166,24 @@
             });
         }
 
-        // TAHAP C: KEMBALI JADI KUBUS
+        // FUNGSI 3: MORPHING KEMBALI KE KUBUS
         function morphToCube() {
             state = 'MORPH_TO_CUBE';
             document.getElementById('info').innerText = "Berubah kembali menjadi kubus!";
-            
-            // Siapkan kubus utama untuk membesar dari titik nol
             mainCube.scale.copy(scaleZero);
             mainCube.visible = true;
         }
 
-        // 5. ANIMASI (LOOP)
+        // 6. ANIMASI (LOOP)
         function animate() {
             requestAnimationFrame(animate);
 
+            // Update pergerakan kamera dari OrbitControls
+            controls.update();
+
             if (state === 'CUBE') {
-                mainCube.rotation.x += 0.01;
-                mainCube.rotation.y += 0.01;
+                mainCube.rotation.x += 0.005;
+                mainCube.rotation.y += 0.005;
             } 
             else if (state === 'EXPLODED') {
                 smallCubes.forEach(cube => {
@@ -167,7 +201,6 @@
                     if (cube.position.distanceTo(scaleZero) > 0.1) readyToMorph = false;
                 });
 
-                // Jika pecahan sudah di tengah, mulai proses morphing visual
                 if (readyToMorph) {
                     state = 'MORPH_TO_SPHERE';
                     lowPolySphere.scale.copy(scaleZero);
@@ -175,9 +208,8 @@
                 }
             }
             else if (state === 'MORPH_TO_SPHERE') {
-                // Sphere membesar, pecahan mengecil (Visual Morphing)
                 lowPolySphere.scale.lerp(scaleOne, 0.15);
-                lowPolySphere.rotation.x += 0.05; // Putaran cepat saat morphing
+                lowPolySphere.rotation.x += 0.05;
                 lowPolySphere.rotation.y += 0.05;
 
                 smallCubes.forEach(cube => {
@@ -186,20 +218,19 @@
 
                 if (lowPolySphere.scale.x > 0.99) {
                     lowPolySphere.scale.copy(scaleOne);
-                    smallCubes.forEach(c => scene.remove(c)); // Bersihkan pecahan
+                    smallCubes.forEach(c => scene.remove(c));
                     smallCubes = [];
                     state = 'SPHERE';
-                    document.getElementById('info').innerText = "Ketuk bola untuk mengembalikannya menjadi KUBUS!";
+                    document.getElementById('info').innerText = "Ketuk BOLA untuk mengembalikannya menjadi KUBUS!";
                 }
             }
             else if (state === 'SPHERE') {
-                lowPolySphere.rotation.x += 0.01;
-                lowPolySphere.rotation.y += 0.015;
+                lowPolySphere.rotation.x += 0.005;
+                lowPolySphere.rotation.y += 0.008;
             }
             else if (state === 'MORPH_TO_CUBE') {
-                // Kubus membesar, Sphere mengecil
                 mainCube.scale.lerp(scaleOne, 0.15);
-                mainCube.rotation.x += 0.05; // Putaran cepat efek magis
+                mainCube.rotation.x += 0.05;
                 mainCube.rotation.y += 0.05;
 
                 lowPolySphere.scale.lerp(scaleZero, 0.15);
