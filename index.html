@@ -3,228 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be Kind</title>
+    <title>3D Pure Text Link Network</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            margin: 0; 
+            background-color: #050508; 
             overflow: hidden; 
-            background-color: #080808; 
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif; 
             user-select: none;
         }
         canvas { display: block; }
+        
+        /* Style Teks Murni Tanpa Shape Pembungkus */
+        .node-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            padding: 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            white-space: nowrap;
+            /* Default Glow Merah Tipis */
+            text-shadow: 0 0 8px rgba(255, 26, 26, 0.6);
+        }
+
+        /* Efek Hover: Merah Menyala Tajam */
+        .node-link:hover {
+            color: #ff1a1a;
+            /* Multi-layer text shadow untuk pendaran merah merana yang kuat */
+            text-shadow: 
+                0 0 5px #ff1a1a,
+                0 0 10px #ff1a1a,
+                0 0 20px #ff0000,
+                0 0 30px #ff0000,
+                0 0 40px #b30000;
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <!-- Import Three.js dan OrbitControls via CDN -->
+    <!-- Import Three.js, OrbitControls & CSS2DRenderer via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 
     <script>
         // 1. SETUP SCENE, CAMERA, & RENDERER
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // 2. ORBIT CONTROLS (Bisa digeser 3D-nya)
+        const labelRenderer = new THREE.CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+
+        // 2. ORBIT CONTROLS
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
+        camera.position.z = 24;
 
-        // PENCAHAYAAN (Dibuat lebih terang)
-        const ambientLight = new THREE.AmbientLight(0x660000, 0.9);
-        scene.add(ambientLight);
+        // 3. TEKSTUR TITIK PARTIKEL GLOW
+        function createPointTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, colorHex);
+            gradient.addColorStop(0.3, colorHex);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
 
-        const pointLight = new THREE.PointLight(0xff3333, 2.0, 50); // Cahaya sorot merah terang
-        pointLight.position.set(10, 10, 10);
-        scene.add(pointLight);
-
-        const fillLight = new THREE.PointLight(0xff0000, 1.2, 50);
-        fillLight.position.set(-10, -10, -10);
-        scene.add(fillLight);
-
-        // WARNA MERAH LEBIH TERANG (BRIGHT RED / CRIMSON)
-        const brightRedColor = 0xff1a1a;
-        const secondRedColor = 0xe60000;
-
-        // 3. OBJEK KUBUS UTAMA
-        const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
-        const cubeMat = new THREE.MeshStandardMaterial({ 
-            color: brightRedColor, 
-            roughness: 0.2, 
-            metalness: 0.2 
-        });
-        let mainCube = new THREE.Mesh(cubeGeo, cubeMat);
-        scene.add(mainCube);
-
-        // 4. OBJEK LOW POLY SPHERE
-        const sphereGeo = new THREE.IcosahedronGeometry(1.5, 1);
-        const sphereMat = new THREE.MeshStandardMaterial({ 
-            color: brightRedColor, 
-            flatShading: true, 
-            roughness: 0.1,
-            metalness: 0.3
-        });
-        const lowPolySphere = new THREE.Mesh(sphereGeo, sphereMat);
-        lowPolySphere.visible = false;
-        scene.add(lowPolySphere);
-
-        camera.position.z = 6;
-
-        // Vektor Skala
-        const scaleOne = new THREE.Vector3(1, 1, 1);
-        const scaleZero = new THREE.Vector3(0, 0, 0);
-
-        let state = 'CUBE'; 
-        let smallCubes = [];
-        
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        // Mencegah klik terpicu saat menggeser kamera (drag)
-        let isDragging = false;
-        window.addEventListener('mousedown', () => isDragging = false);
-        window.addEventListener('mousemove', () => isDragging = true);
-
-        // 5. INTERAKSI KLIK / TOUCH
-        window.addEventListener('pointerup', (event) => {
-            if (isDragging) return;
-
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-
-            if (state === 'CUBE') {
-                const intersects = raycaster.intersectObject(mainCube);
-                if (intersects.length > 0) explodeCube();
-            } 
-            else if (state === 'EXPLODED') {
-                const intersects = raycaster.intersectObjects(smallCubes);
-                if (intersects.length > 0) mergeCubes();
-            }
-            else if (state === 'SPHERE') {
-                const intersects = raycaster.intersectObject(lowPolySphere);
-                if (intersects.length > 0) morphToCube();
-            }
-        });
-
-        // FUNGSI 1: MELEDAK
-        function explodeCube() {
-            state = 'EXPLODED';
-            mainCube.visible = false;
-
-            const count = 7;
-            const radius = 2.2;
-
-            for (let i = 0; i < count; i++) {
-                const smallGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-                const smallMat = new THREE.MeshStandardMaterial({ 
-                    color: (i % 2 === 0) ? brightRedColor : secondRedColor,
-                    roughness: 0.2
-                });
-                const cube = new THREE.Mesh(smallGeo, smallMat);
-
-                const angle = (i / count) * Math.PI * 2;
-                cube.position.set(0, 0, 0);
-                cube.scale.copy(scaleOne);
-
-                cube.userData = {
-                    targetPos: new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0),
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.05, y: (Math.random() - 0.5) * 0.05 }
-                };
-
-                scene.add(cube);
-                smallCubes.push(cube);
-            }
+            return new THREE.CanvasTexture(canvas);
         }
 
-        // FUNGSI 2: MENYATU
-        function mergeCubes() {
-            state = 'MERGING';
-            smallCubes.forEach(cube => {
-                cube.userData.targetPos = new THREE.Vector3(0, 0, 0);
+        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
+        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
+
+        // 4. DATA 7 TITIK LINK (Tanpa Nomor)
+        const linkData = [
+            { name: "PORTFOLIO", url: "https://github.com" },
+            { name: "ABOUT ME", url: "https://github.com" },
+            { name: "PROJECTS", url: "https://github.com" },
+            { name: "SERVICES", url: "https://github.com" },
+            { name: "SKILLS", url: "https://github.com" },
+            { name: "EXPERIENCES", url: "https://github.com" },
+            { name: "CONTACT", url: "https://github.com" }
+        ];
+
+        // 5. MEMBUAT TITIK-TITIK 3D DENGAN TEKS MURNI
+        const particleCount = 140;
+        const particlesData = [];
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+
+        for (let i = 0; i < particleCount; i++) {
+            const isLinkNode = (i < 7);
+
+            const material = new THREE.SpriteMaterial({
+                map: isLinkNode ? redTexture : whiteTexture,
+                transparent: true,
+                opacity: 0.6 + Math.random() * 0.4,
+                blending: THREE.AdditiveBlending
+            });
+
+            const sprite = new THREE.Sprite(material);
+            const scaleSize = isLinkNode ? 0.8 : 0.45;
+            sprite.scale.set(scaleSize, scaleSize, 1.0);
+
+            const posX = (Math.random() - 0.5) * 32;
+            const posY = (Math.random() - 0.5) * 22;
+            const posZ = (Math.random() - 0.5) * 16;
+
+            sprite.position.set(posX, posY, posZ);
+
+            // Teks Murni Tanpa Box/Border
+            if (isLinkNode) {
+                const a = document.createElement('a');
+                a.className = 'node-link';
+                a.href = linkData[i].url;
+                a.target = '_blank';
+                a.innerText = linkData[i].name;
+                a.style.pointerEvents = 'auto';
+
+                const labelObj = new THREE.CSS2DObject(a);
+                labelObj.position.set(0, 0.4, 0); // Posisikan teks tepat di dekat titik
+                sprite.add(labelObj);
+            }
+
+            particleGroup.add(sprite);
+
+            particlesData.push({
+                mesh: sprite,
+                basePos: new THREE.Vector3(posX, posY, posZ),
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.018,
+                    (Math.random() - 0.5) * 0.018,
+                    (Math.random() - 0.5) * 0.018
+                ),
+                alphaSpeed: (Math.random() - 0.5) * 0.008
             });
         }
 
-        // FUNGSI 3: MORPHING KEMBALI KE KUBUS
-        function morphToCube() {
-            state = 'MORPH_TO_CUBE';
-            mainCube.scale.copy(scaleZero);
-            mainCube.visible = true;
-        }
+        // 6. GARIS JARINGAN 3D
+        const maxLines = particleCount * particleCount;
+        const positions = new Float32Array(maxLines * 6);
+        const colors = new Float32Array(maxLines * 6);
 
-        // 6. ANIMASI (LOOP)
+        const linesGeometry = new THREE.BufferGeometry();
+        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const linesMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+        particleGroup.add(linesMesh);
+
+        // 7. RAYCASTER KURSOR
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(-9999, -9999);
+        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, mouse3D);
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse3D.set(-9999, -9999, -9999);
+        });
+
+        // 8. ANIMASI LOOP
         function animate() {
             requestAnimationFrame(animate);
 
             controls.update();
 
-            if (state === 'CUBE') {
-                mainCube.rotation.x += 0.005;
-                mainCube.rotation.y += 0.005;
-            } 
-            else if (state === 'EXPLODED') {
-                smallCubes.forEach(cube => {
-                    cube.position.lerp(cube.userData.targetPos, 0.08);
-                    cube.rotation.x += cube.userData.rotSpeed.x;
-                    cube.rotation.y += cube.userData.rotSpeed.y;
-                });
-            } 
-            else if (state === 'MERGING') {
-                let readyToMorph = true;
-                smallCubes.forEach(cube => {
-                    cube.position.lerp(cube.userData.targetPos, 0.1);
-                    cube.rotation.x += 0.05;
-                    cube.rotation.y += 0.05;
-                    if (cube.position.distanceTo(scaleZero) > 0.1) readyToMorph = false;
-                });
+            let vertexIndex = 0;
+            let colorIndex = 0;
 
-                if (readyToMorph) {
-                    state = 'MORPH_TO_SPHERE';
-                    lowPolySphere.scale.copy(scaleZero);
-                    lowPolySphere.visible = true;
+            for (let i = 0; i < particleCount; i++) {
+                const p = particlesData[i];
+
+                p.mesh.material.opacity += p.alphaSpeed;
+                if (p.mesh.material.opacity >= 1.0 || p.mesh.material.opacity <= 0.4) {
+                    p.alphaSpeed = -p.alphaSpeed;
+                }
+
+                p.basePos.add(p.velocity);
+                if (Math.abs(p.basePos.x) > 17) p.velocity.x *= -1;
+                if (Math.abs(p.basePos.y) > 12) p.velocity.y *= -1;
+                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
+
+                const distToMouse = p.mesh.position.distanceTo(mouse3D);
+                const pushRadius = 7;
+
+                if (distToMouse < pushRadius) {
+                    const force = (pushRadius - distToMouse) / pushRadius;
+                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
+                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
+                } else {
+                    p.mesh.position.lerp(p.basePos, 0.05);
+                }
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2 = particlesData[j];
+                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
+                    const connectDistance = 5.2;
+
+                    if (dist < connectDistance) {
+                        const alpha = (1.0 - dist / connectDistance) * 0.8;
+
+                        positions[vertexIndex++] = p.mesh.position.x;
+                        positions[vertexIndex++] = p.mesh.position.y;
+                        positions[vertexIndex++] = p.mesh.position.z;
+
+                        positions[vertexIndex++] = p2.mesh.position.x;
+                        positions[vertexIndex++] = p2.mesh.position.y;
+                        positions[vertexIndex++] = p2.mesh.position.z;
+
+                        const isLink = (i < 7 || j < 7);
+                        colors[colorIndex++] = isLink ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
+
+                        colors[colorIndex++] = isLink ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
+                    }
                 }
             }
-            else if (state === 'MORPH_TO_SPHERE') {
-                lowPolySphere.scale.lerp(scaleOne, 0.15);
-                lowPolySphere.rotation.x += 0.05;
-                lowPolySphere.rotation.y += 0.05;
 
-                smallCubes.forEach(cube => {
-                    cube.scale.lerp(scaleZero, 0.2);
-                });
-
-                if (lowPolySphere.scale.x > 0.99) {
-                    lowPolySphere.scale.copy(scaleOne);
-                    smallCubes.forEach(c => scene.remove(c));
-                    smallCubes = [];
-                    state = 'SPHERE';
-                }
-            }
-            else if (state === 'SPHERE') {
-                lowPolySphere.rotation.x += 0.005;
-                lowPolySphere.rotation.y += 0.008;
-            }
-            else if (state === 'MORPH_TO_CUBE') {
-                mainCube.scale.lerp(scaleOne, 0.15);
-                mainCube.rotation.x += 0.05;
-                mainCube.rotation.y += 0.05;
-
-                lowPolySphere.scale.lerp(scaleZero, 0.15);
-                lowPolySphere.rotation.x += 0.05;
-                lowPolySphere.rotation.y += 0.05;
-
-                if (mainCube.scale.x > 0.99) {
-                    mainCube.scale.copy(scaleOne);
-                    lowPolySphere.visible = false;
-                    state = 'CUBE';
-                }
-            }
+            linesGeometry.attributes.position.needsUpdate = true;
+            linesGeometry.attributes.color.needsUpdate = true;
+            linesGeometry.setDrawRange(0, vertexIndex / 3);
 
             renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
         }
 
         animate();
@@ -233,6 +273,7 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
