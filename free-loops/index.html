@@ -101,21 +101,68 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 26, 26, 0.3);
         }
 
-        /* ASPEK RASIO 16:9 UNTUK IFRAME YOUTUBE/DRIVE */
-        .video-wrapper {
+        /* KUSTOM THUMBNAIL & PLAY BUTTON (BARU) */
+        .thumbnail-wrapper {
             position: relative;
             padding-bottom: 56.25%; /* Rasio 16:9 */
-            height: 0;
             background: #000;
-            pointer-events: none; /* Mencegah klik tidak sengaja yang menjeda video */
+            cursor: pointer;
+            overflow: hidden;
         }
-        .video-wrapper iframe {
+        
+        .custom-thumbnail {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* Tombol Play Murni CSS */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(10, 10, 15, 0.6);
+            border: 2px solid #ff1a1a;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.3);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        /* Segitiga Play */
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 14px solid #ff1a1a;
+            margin-left: 4px; /* Menyeimbangkan posisi segitiga */
+            transition: all 0.3s ease;
+        }
+
+        /* Efek Hover Thumbnail & Play Button */
+        .video-card:hover .custom-thumbnail {
+            transform: scale(1.08); /* Gambar membesar pelan */
+            opacity: 0.5; /* Gambar meredup */
+        }
+        .video-card:hover .play-button {
+            background: #ff1a1a;
+            box-shadow: 0 0 25px #ff1a1a;
+            transform: translate(-50%, -50%) scale(1.1); /* Tombol membesar */
+        }
+        .video-card:hover .play-button::after {
+            border-left-color: #ffffff; /* Segitiga berubah putih */
         }
 
         /* INFO & TOMBOL KARTU */
@@ -187,8 +234,10 @@
             
             <!-- VIDEO ITEM 1 -->
             <div class="video-card">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/xk3u0pGpAOs?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
+                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 1')">
+                    <!-- Ganti src di bawah ini dengan gambar/foto thumbnail aslimu -->
+                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 1" class="custom-thumbnail">
+                    <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>CYBERPUNK TUNNEL LOOP</h3>
@@ -198,8 +247,9 @@
 
             <!-- VIDEO ITEM 2 -->
             <div class="video-card">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
+                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 2')">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 2" class="custom-thumbnail">
+                    <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>NEON GRID WAVES</h3>
@@ -209,8 +259,9 @@
 
             <!-- VIDEO ITEM 3 -->
             <div class="video-card">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
+                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 3')">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 3" class="custom-thumbnail">
+                    <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>ABSTRACT FRACTAL VJ</h3>
@@ -220,8 +271,9 @@
 
             <!-- VIDEO ITEM 4 -->
             <div class="video-card">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
+                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 4')">
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 4" class="custom-thumbnail">
+                    <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>TECHNO GLITCH BGM</h3>
@@ -231,8 +283,9 @@
 
             <!-- VIDEO ITEM 5 -->
             <div class="video-card">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
+                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 5')">
+                    <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 5" class="custom-thumbnail">
+                    <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>PARTICLE ACCELERATOR</h3>
