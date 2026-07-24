@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ridvx Visual</title>
+    <title>3D Pure Text Link Network with LOUDER Instant Audio</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -231,9 +231,6 @@
         // ==========================================
         // 3. RAYCASTER & MOUSE SOUND TRIGGER
         // ==========================================
-       // ==========================================
-        // 3. RAYCASTER & MOUSE / TOUCH SOUND TRIGGER
-        // ==========================================
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2(-9999, -9999);
         const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
@@ -241,54 +238,28 @@
 
         let lastMoveTime = 0;
 
-        // FUNGSI UNTUK MENGHITUNG KORDINAT KURSOR & JARI
-        function handleInteraction(clientX, clientY) {
+        window.addEventListener('mousemove', (e) => {
             unlockAudio();
 
-            mouse.x = (clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
             raycaster.ray.intersectPlane(plane, mouse3D);
 
             const now = Date.now();
-            // Pemicu suara saat kursor / jari bergerak
+            // Pemicu suara saat kursor bergerak ( Volume di fungsi playTone sudah keras)
             if (now - lastMoveTime > 140) {
-                const freq = 180 + Math.abs((clientX + clientY) % 500);
+                const freq = 180 + Math.abs((e.clientX + e.clientY) % 500);
                 playTone(freq, 0.08, 'sine');
                 lastMoveTime = now;
-            }
-        }
-
-        // 1. Respon Mouse di Laptop/PC
-        window.addEventListener('mousemove', (e) => {
-            handleInteraction(e.clientX, e.clientY);
-        });
-
-        // 2. Respon Usapan Jari di Layar HP
-        window.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 0) {
-                handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
             }
         });
 
         window.addEventListener('mouseleave', () => {
             mouse3D.set(-9999, -9999, -9999);
         });
-        
-        window.addEventListener('touchend', () => {
-            mouse3D.set(-9999, -9999, -9999);
-        });
 
-        // 3. Respon Suara Saat HP Diputar (Rotasi / Resize Layar)
-        window.addEventListener('resize', () => {
-            if (isAudioUnlocked) {
-                // Bunyi distorsi/bass rendah khas techno saat layar berputar
-                playTone(120, 0.4, 'square'); 
-                setTimeout(() => playTone(80, 0.5, 'sawtooth'), 150);
-            }
-        });
-        
         // ==========================================
         // 4. ANIMASI LOOP
         // ==========================================
