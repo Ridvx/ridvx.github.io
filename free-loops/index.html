@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background-color: #050508; 
-            overflow-x: hidden; /* Biarkan overflow-y agar bisa di-scroll */
+            overflow-x: hidden; 
             font-family: Arial, sans-serif; 
             color: #ffffff;
         }
@@ -20,7 +20,7 @@
             top: 0; 
             left: 0; 
             z-index: 1; 
-            pointer-events: none; /* Supaya kursor bisa klik elemen di depannya */
+            pointer-events: none;
         }
 
         /* NAVIGASI BACK */
@@ -48,7 +48,7 @@
         .content-container {
             position: relative;
             z-index: 10;
-            padding: 100px 40px 60px; /* Ruang atas untuk menghindari tabrakan dengan tombol back */
+            padding: 100px 40px 60px;
             min-height: 100vh;
             max-width: 1800px;
             margin: 0 auto;
@@ -78,7 +78,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr); /* 5 Kolom Sejajar */
             gap: 24px;
-            pointer-events: auto; /* Mengaktifkan interaksi klik */
+            pointer-events: auto;
         }
 
         /* KARTU VIDEO (GLASSMORPHISM) */
@@ -107,6 +107,7 @@
             padding-bottom: 56.25%; /* Rasio 16:9 */
             height: 0;
             background: #000;
+            pointer-events: none; /* Mencegah klik tidak sengaja yang menjeda video */
         }
         .video-wrapper iframe {
             position: absolute;
@@ -155,12 +156,12 @@
         /* RESPONSIVE BREAKPOINTS */
         @media (max-width: 1200px) {
             .video-grid {
-                grid-template-columns: repeat(3, 1fr); /* 3 Kolom untuk Tablet/Layar Sedang */
+                grid-template-columns: repeat(3, 1fr);
             }
         }
         @media (max-width: 768px) {
             .video-grid {
-                grid-template-columns: 1fr; /* 1 Kolom untuk HP */
+                grid-template-columns: 1fr;
             }
             .content-container {
                 padding: 80px 20px 40px;
@@ -179,7 +180,7 @@
     <div class="content-container">
         <div class="page-header">
             <h1>FREE LOOPS</h1>
-            <p>DOWNLOAD ROYALTY-FREE RIDVX VISUAL ASSETS</p>
+            <p>DOWNLOAD ROYALTY-FREE VISUAL ASSETS</p>
         </div>
 
         <div class="video-grid">
@@ -187,19 +188,18 @@
             <!-- VIDEO ITEM 1 -->
             <div class="video-card">
                 <div class="video-wrapper">
-                    <!-- Ganti src ini dengan link embed YouTube atau Google Drive -->
-                    <iframe src="https://www.youtube.com/embed/xk3u0pGpAOs?autoplay=0&controls=1" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube.com/embed/xk3u0pGpAOs?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
                 </div>
                 <div class="video-info">
                     <h3>CYBERPUNK TUNNEL LOOP</h3>
-                    <a href="https://youtu.be/xk3u0pGpAOs?si=GAOHAyvMjAqNdbvZ" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
             <!-- VIDEO ITEM 2 -->
             <div class="video-card">
                 <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&controls=1" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
                 </div>
                 <div class="video-info">
                     <h3>NEON GRID WAVES</h3>
@@ -210,7 +210,7 @@
             <!-- VIDEO ITEM 3 -->
             <div class="video-card">
                 <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&controls=1" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
                 </div>
                 <div class="video-info">
                     <h3>ABSTRACT FRACTAL VJ</h3>
@@ -221,7 +221,7 @@
             <!-- VIDEO ITEM 4 -->
             <div class="video-card">
                 <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&controls=1" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
                 </div>
                 <div class="video-info">
                     <h3>TECHNO GLITCH BGM</h3>
@@ -232,15 +232,13 @@
             <!-- VIDEO ITEM 5 -->
             <div class="video-card">
                 <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&controls=1" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>
                 </div>
                 <div class="video-info">
                     <h3>PARTICLE ACCELERATOR</h3>
                     <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
-
-            <!-- Anda bisa menambah blok <div class="video-card"> lagi di bawah sini, dia akan otomatis turun ke baris ke-2 -->
 
         </div>
     </div>
@@ -252,7 +250,6 @@
     <script>
         // ==========================================
         // SCRIPT BACKGROUND JARINGAN 3D
-        // (Tanpa audio agar tidak mengganggu suara video)
         // ==========================================
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -265,7 +262,7 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.enableZoom = false; // Matikan zoom supaya scroll layar berfungsi normal
+        controls.enableZoom = false; 
         camera.position.z = 22;
 
         function createPointTexture(colorHex) {
@@ -344,7 +341,6 @@
         const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
         particleGroup.add(linesMesh);
 
-        // RAYCASTER UNTUK EFEK MENGHINDAR
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2(-9999, -9999);
         const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
