@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Pure Text Link Network with LOUDER Instant Audio</title>
+    <title>Ridvx Visual</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -143,10 +143,10 @@
         const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
         const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
 
-        // JANGAN LUPA GANTI URL CONTACT KE FOLDER /contact/
+        // DATA LINK DIRUBAH MENJADI 5 MENU
         const linkData = [
-            { name: "PORTFOLIO", url: "#" },
             { name: "ARTWORKS", url: "#" },
+            { name: "PORTOFOLIO", url: "#" },
             { name: "FREE LOOPS", url: "#" },
             { name: "VISUAL ASSET", url: "#" },
             { name: "CONNECT", url: "/contact/" } 
@@ -158,7 +158,7 @@
         scene.add(particleGroup);
 
         for (let i = 0; i < particleCount; i++) {
-            const isLinkNode = (i < 7);
+            const isLinkNode = (i < 5); // BATAS MENU MENJADI 5
 
             const material = new THREE.SpriteMaterial({
                 map: isLinkNode ? redTexture : whiteTexture,
@@ -187,7 +187,7 @@
                 // Bunyi saat kursor menyentuh teks link (Volume Keras)
                 a.addEventListener('mouseenter', () => {
                     unlockAudio();
-                    const freqs = [330, 440, 554, 659, 880, 987, 1174];
+                    const freqs = [330, 440, 554, 659, 880]; // Disesuaikan menjadi 5 frekuensi
                     playTone(freqs[i % freqs.length], 0.25, 'triangle');
                 });
 
@@ -311,7 +311,7 @@
                         positions[vertexIndex++] = p2.mesh.position.y;
                         positions[vertexIndex++] = p2.mesh.position.z;
 
-                        const isLink = (i < 7 || j < 7);
+                        const isLink = (i < 5 || j < 5); // BATAS PEWARNAAN GARIS MENJADI 5
                         colors[colorIndex++] = isLink ? alpha : alpha * 0.8;
                         colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
                         colors[colorIndex++] = isLink ? alpha * 0.1 : alpha * 0.8;
