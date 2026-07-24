@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ridvx visual</title>
+    <title>Ridvx Visual</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -11,10 +11,10 @@
             overflow: hidden; 
             font-family: Arial, sans-serif; 
             user-select: none;
+            cursor: pointer;
         }
         canvas { display: block; }
         
-        /* Style Teks Murni Tanpa Shape Pembungkus */
         .node-link {
             color: rgba(255, 255, 255, 0.85);
             font-size: 13px;
@@ -27,14 +27,11 @@
             transition: all 0.3s ease;
             cursor: pointer;
             white-space: nowrap;
-            /* Default Glow Merah Tipis */
             text-shadow: 0 0 8px rgba(255, 26, 26, 0.6);
         }
 
-        /* Efek Hover: Merah Menyala Tajam */
         .node-link:hover {
             color: #ff1a1a;
-            /* Multi-layer text shadow untuk pendaran merah merana yang kuat */
             text-shadow: 
                 0 0 5px #ff1a1a,
                 0 0 10px #ff1a1a,
@@ -47,13 +44,65 @@
 </head>
 <body>
 
-    <!-- Import Three.js, OrbitControls & CSS2DRenderer via CDN -->
+    <!-- CDN Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 
     <script>
-        // 1. SETUP SCENE, CAMERA, & RENDERER
+        // ==========================================
+        // 1. INSTANT UNLOCK AUDIO ENGINE
+        // ==========================================
+        let audioCtx = null;
+        let isAudioUnlocked = false;
+
+        function unlockAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!isAudioUnlocked && audioCtx.state === 'running') {
+                isAudioUnlocked = true;
+                // Bunyi pemicu pertama (Volume dinaikkan lagi = 0.32)
+                playTone(440, 0.2, 'sawtooth');
+            }
+        }
+
+        // Event listener interaksi untuk unlock audio browser
+        ['click', 'mousedown', 'mouseup', 'keydown', 'touchstart', 'mousemove'].forEach(eventType => {
+            window.addEventListener(eventType, unlockAudio, { once: false });
+        });
+
+        // FUNGSI SUARA TECHNO (VOLUME DI-BOOST LAGI 2X LIPAT DARI SEBELUMNYA)
+        function playTone(freq, duration = 0.12, type = 'sine') {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                // Volume dinaikkan dari 0.16 menjadi 0.32 (Sangat Keras)
+                gain.gain.setValueAtTime(0.32, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        // ==========================================
+        // 2. THREE.JS SCENE SETUP
+        // ==========================================
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         
@@ -69,13 +118,11 @@
         labelRenderer.domElement.style.pointerEvents = 'none';
         document.body.appendChild(labelRenderer.domElement);
 
-        // 2. ORBIT CONTROLS
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         camera.position.z = 24;
 
-        // 3. TEKSTUR TITIK PARTIKEL GLOW
         function createPointTexture(colorHex) {
             const canvas = document.createElement('canvas');
             canvas.width = 64;
@@ -96,18 +143,17 @@
         const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
         const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
 
-        // 4. DATA 7 TITIK LINK (Tanpa Nomor)
+        // JANGAN LUPA GANTI URL CONTACT KE FOLDER /contact/
         const linkData = [
-            { name: "PORTFOLIO", url: "https://github.com" },
-            { name: "ABOUT ME", url: "https://github.com" },
-            { name: "PROJECTS", url: "https://github.com" },
-            { name: "SERVICES", url: "https://github.com" },
-            { name: "SKILLS", url: "https://github.com" },
-            { name: "EXPERIENCES", url: "https://github.com" },
-            { name: "CONTACT", url: "/contact/" }
+            { name: "PORTFOLIO", url: "#" },
+            { name: "ABOUT ME", url: "#" },
+            { name: "PROJECTS", url: "#" },
+            { name: "SERVICES", url: "#" },
+            { name: "SKILLS", url: "#" },
+            { name: "EXPERIENCES", url: "#" },
+            { name: "CONTACT", url: "/contact/" } 
         ];
 
-        // 5. MEMBUAT TITIK-TITIK 3D DENGAN TEKS MURNI
         const particleCount = 140;
         const particlesData = [];
         const particleGroup = new THREE.Group();
@@ -133,17 +179,22 @@
 
             sprite.position.set(posX, posY, posZ);
 
-            // Teks Murni Tanpa Box/Border
             if (isLinkNode) {
                 const a = document.createElement('a');
                 a.className = 'node-link';
                 a.href = linkData[i].url;
-               // a.target = '_blank';
                 a.innerText = linkData[i].name;
                 a.style.pointerEvents = 'auto';
 
+                // Bunyi saat kursor menyentuh teks link (Volume Keras)
+                a.addEventListener('mouseenter', () => {
+                    unlockAudio();
+                    const freqs = [330, 440, 554, 659, 880, 987, 1174];
+                    playTone(freqs[i % freqs.length], 0.25, 'triangle');
+                });
+
                 const labelObj = new THREE.CSS2DObject(a);
-                labelObj.position.set(0, 0.4, 0); // Posisikan teks tepat di dekat titik
+                labelObj.position.set(0, 0.4, 0);
                 sprite.add(labelObj);
             }
 
@@ -161,7 +212,6 @@
             });
         }
 
-        // 6. GARIS JARINGAN 3D
         const maxLines = particleCount * particleCount;
         const positions = new Float32Array(maxLines * 6);
         const colors = new Float32Array(maxLines * 6);
@@ -180,25 +230,41 @@
         const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
         particleGroup.add(linesMesh);
 
-        // 7. RAYCASTER KURSOR
+        // ==========================================
+        // 3. RAYCASTER & MOUSE SOUND TRIGGER
+        // ==========================================
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2(-9999, -9999);
         const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
+        let lastMoveTime = 0;
+
         window.addEventListener('mousemove', (e) => {
+            unlockAudio();
+
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
             raycaster.ray.intersectPlane(plane, mouse3D);
+
+            const now = Date.now();
+            // Pemicu suara saat kursor bergerak ( Volume di fungsi playTone sudah keras)
+            if (now - lastMoveTime > 140) {
+                const freq = 180 + Math.abs((e.clientX + e.clientY) % 500);
+                playTone(freq, 0.08, 'sine');
+                lastMoveTime = now;
+            }
         });
 
         window.addEventListener('mouseleave', () => {
             mouse3D.set(-9999, -9999, -9999);
         });
 
-        // 8. ANIMASI LOOP
+        // ==========================================
+        // 4. ANIMASI LOOP
+        // ==========================================
         function animate() {
             requestAnimationFrame(animate);
 
