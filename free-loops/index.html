@@ -101,7 +101,7 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 26, 26, 0.3);
         }
 
-        /* KUSTOM THUMBNAIL & PLAY BUTTON (BARU) */
+        /* WRAPPER VIDEO ASLI */
         .thumbnail-wrapper {
             position: relative;
             padding-bottom: 56.25%; /* Rasio 16:9 */
@@ -147,22 +147,28 @@
             border-top: 8px solid transparent;
             border-bottom: 8px solid transparent;
             border-left: 14px solid #ff1a1a;
-            margin-left: 4px; /* Menyeimbangkan posisi segitiga */
+            margin-left: 4px;
             transition: all 0.3s ease;
         }
 
-        /* Efek Hover Thumbnail & Play Button */
+        /* Efek Hover */
         .video-card:hover .custom-thumbnail {
-            transform: scale(1.08); /* Gambar membesar pelan */
-            opacity: 0.5; /* Gambar meredup */
+            transform: scale(1.08);
+            opacity: 0.6;
         }
         .video-card:hover .play-button {
             background: #ff1a1a;
             box-shadow: 0 0 25px #ff1a1a;
-            transform: translate(-50%, -50%) scale(1.1); /* Tombol membesar */
+            transform: translate(-50%, -50%) scale(1.1);
         }
         .video-card:hover .play-button::after {
-            border-left-color: #ffffff; /* Segitiga berubah putih */
+            border-left-color: #ffffff;
+        }
+
+        /* Kelas untuk menyembunyikan tombol play setelah video diputar */
+        .playing .play-button {
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* INFO & TOMBOL KARTU */
@@ -208,7 +214,7 @@
         }
         @media (max-width: 768px) {
             .video-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* 1 Kolom untuk HP */
             }
             .content-container {
                 padding: 80px 20px 40px;
@@ -234,76 +240,97 @@
             
             <!-- VIDEO ITEM 1 -->
             <div class="video-card">
-                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 1')">
-                    <!-- Ganti src di bawah ini dengan gambar/foto thumbnail aslimu -->
-                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 1" class="custom-thumbnail">
+                <div class="thumbnail-wrapper" onclick="togglePlay(this)">
+                    <video src="video1.mp4" class="custom-thumbnail" loop muted playsinline></video>
                     <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>CYBERPUNK TUNNEL LOOP</h3>
-                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="video1.mp4" download class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
             <!-- VIDEO ITEM 2 -->
             <div class="video-card">
-                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 2')">
-                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 2" class="custom-thumbnail">
+                <div class="thumbnail-wrapper" onclick="togglePlay(this)">
+                    <video src="video2.mp4" class="custom-thumbnail" loop muted playsinline></video>
                     <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>NEON GRID WAVES</h3>
-                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="video2.mp4" download class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
             <!-- VIDEO ITEM 3 -->
             <div class="video-card">
-                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 3')">
-                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 3" class="custom-thumbnail">
+                <div class="thumbnail-wrapper" onclick="togglePlay(this)">
+                    <video src="video3.mp4" class="custom-thumbnail" loop muted playsinline></video>
                     <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>ABSTRACT FRACTAL VJ</h3>
-                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="video3.mp4" download class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
             <!-- VIDEO ITEM 4 -->
             <div class="video-card">
-                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 4')">
-                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 4" class="custom-thumbnail">
+                <div class="thumbnail-wrapper" onclick="togglePlay(this)">
+                    <video src="video4.mp4" class="custom-thumbnail" loop muted playsinline></video>
                     <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>TECHNO GLITCH BGM</h3>
-                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="video4.mp4" download class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
             <!-- VIDEO ITEM 5 -->
             <div class="video-card">
-                <div class="thumbnail-wrapper" onclick="alert('Ini akan memutar video 5')">
-                    <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=640&auto=format&fit=crop" alt="Thumbnail 5" class="custom-thumbnail">
+                <div class="thumbnail-wrapper" onclick="togglePlay(this)">
+                    <video src="video5.mp4" class="custom-thumbnail" loop muted playsinline></video>
                     <div class="play-button"></div>
                 </div>
                 <div class="video-info">
                     <h3>PARTICLE ACCELERATOR</h3>
-                    <a href="#" target="_blank" class="download-btn">DOWNLOAD HQ</a>
+                    <a href="video5.mp4" download class="download-btn">DOWNLOAD HQ</a>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- Import Three.js & OrbitControls -->
+    <!-- Script Interaktif Play/Pause Video (Auto-Pause yang Lain) -->
+    <script>
+        function togglePlay(wrapper) {
+            const currentVideo = wrapper.querySelector('video');
+
+            // 1. Matikan/pause semua video lain yang sedang berputar di halaman
+            document.querySelectorAll('.thumbnail-wrapper').forEach(item => {
+                const video = item.querySelector('video');
+                if (video !== currentVideo && !video.paused) {
+                    video.pause();
+                    item.classList.remove('playing');
+                }
+            });
+
+            // 2. Play atau Pause video yang sedang diklik
+            if (currentVideo.paused) {
+                currentVideo.play();
+                wrapper.classList.add('playing');
+            } else {
+                currentVideo.pause();
+                wrapper.classList.remove('playing');
+            }
+        }
+    </script>
+
+    <!-- Import Three.js & OrbitControls untuk Background 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        // ==========================================
-        // SCRIPT BACKGROUND JARINGAN 3D
-        // ==========================================
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         
