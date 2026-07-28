@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artworks & Exhibitions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #050508; 
+            overflow-x: hidden; 
+            font-family: Arial, sans-serif; 
+            color: #ffffff;
+        }
+
+        /* CANVAS LATAR BELAKANG FIXED */
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        /* NAVIGASI BACK */
+        .back-nav {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 20;
+        }
+        .back-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(255, 26, 26, 0.8);
+            transition: all 0.3s ease;
+        }
+        .back-nav a:hover {
+            color: #ff1a1a;
+            text-shadow: 0 0 15px #ff1a1a;
+        }
+
+        /* CONTAINER KONTEN UTAMA */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 100px 40px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            pointer-events: none;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+        }
+        .page-header p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* DAFTAR KARYA (LIST) */
+        .artwork-list {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        /* KARTU KARYA (GLASSMORPHISM) */
+        .artwork-card {
+            background: rgba(5, 5, 8, 0.25); /* Kaca transparan */
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Rasio Teks vs Gambar */
+            gap: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 26, 26, 0.05);
+            pointer-events: auto;
+            transition: border-color 0.4s ease;
+        }
+
+        .artwork-card:hover {
+            border-color: rgba(255, 26, 26, 0.7);
+        }
+
+        /* Variasi Layout: Posisi teks di kanan untuk kartu genap */
+        .artwork-card.reverse {
+            grid-template-columns: 1.5fr 1fr;
+        }
+        .artwork-card.reverse .artwork-info {
+            order: 2;
+        }
+        .artwork-card.reverse .artwork-gallery {
+            order: 1;
+        }
+
+        /* BAGIAN TEKS DESKRIPSI */
+        .artwork-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .artwork-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 26, 26, 0.5);
+        }
+        .artwork-meta {
+            font-size: 0.85rem;
+            color: #ff1a1a;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .artwork-desc {
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.7;
+            letter-spacing: 0.5px;
+        }
+
+        /* BAGIAN GALERI GAMBAR (1 BESAR, 2 KECIL) */
+        .artwork-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 15px;
+        }
+
+        /* WADAH GAMBAR */
+        .img-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .main-img {
+            grid-column: span 2; /* Mengambil ruang 2 kolom penuh di atas */
+            aspect-ratio: 16 / 9;
+        }
+
+        .sub-img {
+            aspect-ratio: 4 / 3;
+        }
+
+        .strobe-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        /* ==========================================
+           ANIMASI STROBO TIPIS SAAT GAMBAR DI-HOVER
+           ========================================== */
+        .img-wrapper:hover .strobe-img {
+            /* Memanggil animasi kedip (strobo) dengan kecepatan sangat tinggi */
+            animation: subtle-strobe 0.12s infinite;
+        }
+
+        @keyframes subtle-strobe {
+            0%, 100% { 
+                filter: brightness(1) contrast(1); 
+                opacity: 1; 
+            }
+            33% { 
+                filter: brightness(1.5) contrast(1.1); /* Kilatan terang */
+                opacity: 0.9; 
+            }
+            66% { 
+                filter: brightness(0.7) contrast(1.3); /* Kilatan gelap */
+                opacity: 0.95; 
+            }
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 992px) {
+            .artwork-card, .artwork-card.reverse {
+                grid-template-columns: 1fr; /* Tumpuk jadi 1 kolom di layar kecil */
+                gap: 30px;
+            }
+            .artwork-card.reverse .artwork-info, 
+            .artwork-card.reverse .artwork-gallery {
+                order: unset; /* Kembalikan urutan normal di HP */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tombol Kembali -->
+    <div class="back-nav">
+        <a href="/">&larr; BACK</a>
+    </div>
+
+    <div class="content-container">
+        <div class="page-header">
+            <h1>EXHIBITIONS</h1>
+            <p>SELECTED ARTWORKS & INSTALLATIONS</p>
+        </div>
+
+        <div class="artwork-list">
+            
+            <!-- KARYA 1 -->
+            <div class="artwork-card">
+                <!-- Sisi Teks -->
+                <div class="artwork-info">
+                    <h2 class="artwork-title">masih mau nyusun</h2>
+                    <div class="artwork-meta">2023 | Mixed Media & Projection Mapping</div>
+                    <p class="artwork-desc">
+                     loremipsum
+                    </p>
+                </div>
+                <!-- Sisi Gambar -->
+                <div class="artwork-gallery">
+                    <!-- Ganti src dengan link/gambar karyamu -->
+                    <div class="img-wrapper main-img">
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop" alt="Karya 1 - Utama" class="strobe-img">
+                    </div>
+                    <div class="img-wrapper sub-img">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400&auto=format&fit=crop" alt="Karya 1 - Detail 1" class="strobe-img">
+                    </div>
+                    <div class="img-wrapper sub-img">
+                        <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=400&auto=format&fit=crop" alt="Karya 1 - Detail 2" class="strobe-img">
+                    </div>
+                </div>
+            </div>
+
+            <!-- KARYA 2 (Menggunakan class "reverse" agar posisi gambar di kiri) -->
+            <div class="artwork-card reverse">
+                <!-- Sisi Teks -->
+                <div class="artwork-info">
+                    <h2 class="artwork-title">masih mau nyusun</h2>
+                    <div class="artwork-meta">2024 | Generative Art & 3D Render</div>
+                    <p class="artwork-desc">
+                    loremipsum
+                    </p>
+                </div>
+                <!-- Sisi Gambar -->
+                <div class="artwork-gallery">
+                    <div class="img-wrapper main-img">
+                        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop" alt="Karya 2 - Utama" class="strobe-img">
+                    </div>
+                    <div class="img-wrapper sub-img">
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" alt="Karya 2 - Detail 1" class="strobe-img">
+                    </div>
+                    <div class="img-wrapper sub-img">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400&auto=format&fit=crop" alt="Karya 2 - Detail 2" class="strobe-img">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Import Three.js & OrbitControls untuk Background 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false; 
+        camera.position.z = 22;
+
+        function createPointTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, colorHex);
+            gradient.addColorStop(0.3, colorHex);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
+        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
+
+        const particleCount = 130;
+        const particlesData = [];
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+
+        for (let i = 0; i < particleCount; i++) {
+            const isRedNode = (i % 12 === 0);
+
+            const material = new THREE.SpriteMaterial({
+                map: isRedNode ? redTexture : whiteTexture,
+                transparent: true,
+                opacity: 0.4 + Math.random() * 0.4,
+                blending: THREE.AdditiveBlending
+            });
+
+            const sprite = new THREE.Sprite(material);
+            const scaleSize = isRedNode ? 0.7 : 0.4;
+            sprite.scale.set(scaleSize, scaleSize, 1.0);
+
+            const posX = (Math.random() - 0.5) * 34;
+            const posY = (Math.random() - 0.5) * 24;
+            const posZ = (Math.random() - 0.5) * 16;
+
+            sprite.position.set(posX, posY, posZ);
+            particleGroup.add(sprite);
+
+            particlesData.push({
+                mesh: sprite,
+                basePos: new THREE.Vector3(posX, posY, posZ),
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015
+                ),
+                alphaSpeed: (Math.random() - 0.5) * 0.008,
+                isRed: isRedNode
+            });
+        }
+
+        const maxLines = particleCount * particleCount;
+        const positions = new Float32Array(maxLines * 6);
+        const colors = new Float32Array(maxLines * 6);
+
+        const linesGeometry = new THREE.BufferGeometry();
+        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const linesMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+        particleGroup.add(linesMesh);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(-9999, -9999);
+        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, mouse3D);
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse3D.set(-9999, -9999, -9999);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            let vertexIndex = 0;
+            let colorIndex = 0;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = particlesData[i];
+
+                p.mesh.material.opacity += p.alphaSpeed;
+                if (p.mesh.material.opacity >= 0.8 || p.mesh.material.opacity <= 0.2) {
+                    p.alphaSpeed = -p.alphaSpeed;
+                }
+
+                p.basePos.add(p.velocity);
+                if (Math.abs(p.basePos.x) > 18) p.velocity.x *= -1;
+                if (Math.abs(p.basePos.y) > 13) p.velocity.y *= -1;
+                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
+
+                const distToMouse = p.mesh.position.distanceTo(mouse3D);
+                const pushRadius = 7;
+
+                if (distToMouse < pushRadius) {
+                    const force = (pushRadius - distToMouse) / pushRadius;
+                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
+                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
+                } else {
+                    p.mesh.position.lerp(p.basePos, 0.05);
+                }
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2 = particlesData[j];
+                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
+                    const connectDistance = 5.2;
+
+                    if (dist < connectDistance) {
+                        const alpha = (1.0 - dist / connectDistance) * 0.6;
+
+                        positions[vertexIndex++] = p.mesh.position.x;
+                        positions[vertexIndex++] = p.mesh.position.y;
+                        positions[vertexIndex++] = p.mesh.position.z;
+
+                        positions[vertexIndex++] = p2.mesh.position.x;
+                        positions[vertexIndex++] = p2.mesh.position.y;
+                        positions[vertexIndex++] = p2.mesh.position.z;
+
+                        const isRedLine = p.isRed || p2.isRed;
+                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+
+                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                    }
+                }
+            }
+
+            linesGeometry.attributes.position.needsUpdate = true;
+            linesGeometry.attributes.color.needsUpdate = true;
+            linesGeometry.setDrawRange(0, vertexIndex / 3);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
