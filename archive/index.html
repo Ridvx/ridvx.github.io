@@ -172,9 +172,6 @@
 
         <div class="motion-grid">
             
-            <!-- Cukup masukkan tag video dan sumbernya saja. 
-                 Browser akan otomatis mengatur tinggi pendeknya berdasarkan video asli! -->
-            
             <div class="motion-card">
                 <video src="dwp1.mp4" class="motion-video" controls playsinline preload="metadata"></video>
                 <div class="motion-title">dwp 3d visual</div>
@@ -242,6 +239,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
+        // SCRIPT AGAR VIDEO LAIN BERHENTI KETIKA SATU VIDEO DIPUTAR
+        const allVideos = document.querySelectorAll('.motion-video');
+        allVideos.forEach(video => {
+            video.addEventListener('play', function() {
+                allVideos.forEach(otherVideo => {
+                    if (otherVideo !== video) {
+                        otherVideo.pause();
+                    }
+                });
+            });
+        });
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
