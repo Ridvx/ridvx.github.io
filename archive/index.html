@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motion Archive</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #050508; 
+            overflow-x: hidden; 
+            font-family: Arial, sans-serif; 
+            color: #ffffff;
+        }
+
+        /* CANVAS LATAR BELAKANG FIXED */
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        /* NAVIGASI BACK */
+        .back-nav {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 20;
+        }
+        .back-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(255, 26, 26, 0.8);
+            transition: all 0.3s ease;
+        }
+        .back-nav a:hover {
+            color: #ff1a1a;
+            text-shadow: 0 0 15px #ff1a1a;
+        }
+
+        /* CONTAINER KONTEN UTAMA */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 100px 40px 80px;
+            max-width: 1700px; 
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            pointer-events: none;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+        }
+        .page-header p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* AUTO-MASONRY GRID (5 KOLOM OTOMATIS) */
+        .motion-grid {
+            column-count: 5; 
+            column-gap: 24px;
+            pointer-events: auto;
+        }
+
+        /* KARTU VIDEO (GLASSMORPHISM) */
+        .motion-card {
+            break-inside: avoid; /* Mencegah kartu terpotong antar kolom */
+            margin-bottom: 24px;
+            background: rgba(5, 5, 8, 0.25); 
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 26, 26, 0.05);
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .motion-card:hover {
+            border-color: rgba(255, 26, 26, 0.7);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 26, 26, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* VIDEO OTOMATIS MENYESUAIKAN ASPEK RASIO ASLI FILE MP4 */
+        .motion-video {
+            width: 100%;
+            height: auto; /* Browser otomatis mendeteksi apakah video ini portrait atau square */
+            border-radius: 8px;
+            background-color: #000;
+            outline: none;
+            object-fit: cover;
+        }
+
+        /* JUDUL KARYA */
+        .motion-title {
+            margin-top: 15px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* TOMBOL LIVE VIEW */
+        .live-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(255, 26, 26, 0.5);
+            color: #ff1a1a;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .live-btn:hover {
+            background: #ff1a1a;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.5);
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 1400px) { .motion-grid { column-count: 4; } }
+        @media (max-width: 1100px) { .motion-grid { column-count: 3; } }
+        @media (max-width: 768px) { 
+            .motion-grid { column-count: 2; } 
+            .content-container { padding: 90px 20px 60px; }
+        }
+        @media (max-width: 500px) { .motion-grid { column-count: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="/">&larr; BACK TO HOME</a>
+    </div>
+
+    <div class="content-container">
+        <div class="page-header">
+            <h1>MOTION ARCHIVE</h1>
+            <p>SELECTED VIDEO PORTFOLIO</p>
+        </div>
+
+        <div class="motion-grid">
+            
+            <!-- Cukup masukkan tag video dan sumbernya saja. 
+                 Browser akan otomatis mengatur tinggi pendeknya berdasarkan video asli! -->
+            
+            <div class="motion-card">
+                <video src="video1.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">CYBER CITY LOOP</div>
+                <a href="https://instagram.com/p/link-asli-1" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video2.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">ABSTRACT VJ</div>
+                <a href="https://instagram.com/p/link-asli-2" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video3.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">NEON LOGO</div>
+                <a href="https://instagram.com/p/link-asli-3" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video4.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">3D TYPOGRAPHY</div>
+                <a href="https://instagram.com/p/link-asli-4" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video5.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">HOLOGRAPHIC UI</div>
+                <a href="https://instagram.com/p/link-asli-5" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video6.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">KINETIC MOTION</div>
+                <a href="https://instagram.com/p/link-asli-6" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video7.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">PRODUCT REVEAL</div>
+                <a href="https://instagram.com/p/link-asli-7" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video8.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">SCI-FI HUD</div>
+                <a href="https://instagram.com/p/link-asli-8" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video9.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">GLITCH EFFECT</div>
+                <a href="https://instagram.com/p/link-asli-9" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+            <div class="motion-card">
+                <video src="video10.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <div class="motion-title">FRACTAL LOOP</div>
+                <a href="https://instagram.com/p/link-asli-10" target="_blank" class="live-btn">LIVE VIEW</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Background Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false; 
+        camera.position.z = 22;
+
+        function createPointTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, colorHex);
+            gradient.addColorStop(0.3, colorHex);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
+        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
+
+        const particleCount = 130;
+        const particlesData = [];
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+
+        for (let i = 0; i < particleCount; i++) {
+            const isRedNode = (i % 12 === 0);
+            const material = new THREE.SpriteMaterial({
+                map: isRedNode ? redTexture : whiteTexture,
+                transparent: true,
+                opacity: 0.4 + Math.random() * 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const sprite = new THREE.Sprite(material);
+            const scaleSize = isRedNode ? 0.7 : 0.4;
+            sprite.scale.set(scaleSize, scaleSize, 1.0);
+            const posX = (Math.random() - 0.5) * 34;
+            const posY = (Math.random() - 0.5) * 24;
+            const posZ = (Math.random() - 0.5) * 16;
+            sprite.position.set(posX, posY, posZ);
+            particleGroup.add(sprite);
+
+            particlesData.push({
+                mesh: sprite,
+                basePos: new THREE.Vector3(posX, posY, posZ),
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015
+                ),
+                alphaSpeed: (Math.random() - 0.5) * 0.008,
+                isRed: isRedNode
+            });
+        }
+
+        const maxLines = particleCount * particleCount;
+        const positions = new Float32Array(maxLines * 6);
+        const colors = new Float32Array(maxLines * 6);
+        const linesGeometry = new THREE.BufferGeometry();
+        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const linesMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+        particleGroup.add(linesMesh);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(-9999, -9999);
+        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, mouse3D);
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse3D.set(-9999, -9999, -9999);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            let vertexIndex = 0;
+            let colorIndex = 0;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = particlesData[i];
+                p.mesh.material.opacity += p.alphaSpeed;
+                if (p.mesh.material.opacity >= 0.8 || p.mesh.material.opacity <= 0.2) {
+                    p.alphaSpeed = -p.alphaSpeed;
+                }
+                p.basePos.add(p.velocity);
+                if (Math.abs(p.basePos.x) > 18) p.velocity.x *= -1;
+                if (Math.abs(p.basePos.y) > 13) p.velocity.y *= -1;
+                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
+
+                const distToMouse = p.mesh.position.distanceTo(mouse3D);
+                const pushRadius = 7;
+                if (distToMouse < pushRadius) {
+                    const force = (pushRadius - distToMouse) / pushRadius;
+                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
+                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
+                } else {
+                    p.mesh.position.lerp(p.basePos, 0.05);
+                }
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2 = particlesData[j];
+                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
+                    const connectDistance = 5.2;
+
+                    if (dist < connectDistance) {
+                        const alpha = (1.0 - dist / connectDistance) * 0.6;
+                        positions[vertexIndex++] = p.mesh.position.x;
+                        positions[vertexIndex++] = p.mesh.position.y;
+                        positions[vertexIndex++] = p.mesh.position.z;
+                        positions[vertexIndex++] = p2.mesh.position.x;
+                        positions[vertexIndex++] = p2.mesh.position.y;
+                        positions[vertexIndex++] = p2.mesh.position.z;
+
+                        const isRedLine = p.isRed || p2.isRed;
+                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
+                    }
+                }
+            }
+
+            linesGeometry.attributes.position.needsUpdate = true;
+            linesGeometry.attributes.color.needsUpdate = true;
+            linesGeometry.setDrawRange(0, vertexIndex / 3);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
