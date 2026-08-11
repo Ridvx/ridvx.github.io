@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motion Archive</title>
+    <title>Motion Archive - ridvx</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -82,7 +82,7 @@
 
         /* KARTU VIDEO (GLASSMORPHISM) */
         .motion-card {
-            break-inside: avoid; /* Mencegah kartu terpotong antar kolom */
+            break-inside: avoid; 
             margin-bottom: 24px;
             background: rgba(5, 5, 8, 0.25); 
             border: 1px solid rgba(255, 26, 26, 0.3);
@@ -103,10 +103,10 @@
             transform: translateY(-5px);
         }
 
-        /* VIDEO OTOMATIS MENYESUAIKAN ASPEK RASIO ASLI FILE MP4 */
+        /* VIDEO OTOMATIS MENYESUAIKAN ASPEK RASIO ASLI */
         .motion-video {
             width: 100%;
-            height: auto; /* Browser otomatis mendeteksi apakah video ini portrait atau square */
+            height: auto; 
             border-radius: 8px;
             background-color: #000;
             outline: none;
@@ -167,67 +167,67 @@
     <div class="content-container">
         <div class="page-header">
             <h1>MOTION ARCHIVE</h1>
-            <p>SELECTED VIDEO PORTFOLIO</p>
+            <p>motion-motion-motion</p>
         </div>
 
         <div class="motion-grid">
             
             <div class="motion-card">
-                <video src="dwp1.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="dwp1.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">dwp 3d visual</div>
                 <a href="https://www.instagram.com/p/DScma76kfb2/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="monti.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="monti.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">Montigo Resort</div>
                 <a href="https://www.instagram.com/reel/DU1tT3_E8Tq/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="ponbi.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="ponbi.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">Pontianak Biennale</div>
                 <a href="https://www.instagram.com/reel/Dau7EGhPCNh/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video4.mp4" class="motion-video" controls playsinline preload="metadata"></video>
-                <div class="motion-title">3D TYPOGRAPHY</div>
-                <a href="https://instagram.com/p/link-asli-4" target="_blank" class="live-btn">LIVE VIEW</a>
+                <video src="shell.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <div class="motion-title">Shell Patisserie</div>
+                <a href="https://www.instagram.com/p/DbxX17VpoHD/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video5.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video5.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">HOLOGRAPHIC UI</div>
                 <a href="https://instagram.com/p/link-asli-5" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video6.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video6.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">KINETIC MOTION</div>
                 <a href="https://instagram.com/p/link-asli-6" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video7.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video7.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">PRODUCT REVEAL</div>
                 <a href="https://instagram.com/p/link-asli-7" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video8.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video8.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">SCI-FI HUD</div>
                 <a href="https://instagram.com/p/link-asli-8" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video9.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video9.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">GLITCH EFFECT</div>
                 <a href="https://instagram.com/p/link-asli-9" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
             <div class="motion-card">
-                <video src="video10.mp4" class="motion-video" controls playsinline preload="metadata"></video>
+                <video src="video10.mp4" class="motion-video" controls preload="metadata" playsinline></video>
                 <div class="motion-title">FRACTAL LOOP</div>
                 <a href="https://instagram.com/p/link-asli-10" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
@@ -235,13 +235,15 @@
         </div>
     </div>
 
-    <!-- Script Background Three.js -->
+    <!-- Script Background Three.js & Video Optimizer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // SCRIPT AGAR VIDEO LAIN BERHENTI KETIKA SATU VIDEO DIPUTAR
+        // 1. OPTIMASI VIDEO: AUTO-PAUSE & AUTO-THUMBNAIL GENERATOR
         const allVideos = document.querySelectorAll('.motion-video');
+        
         allVideos.forEach(video => {
+            // Hentikan video lain saat satu video diputar
             video.addEventListener('play', function() {
                 allVideos.forEach(otherVideo => {
                     if (otherVideo !== video) {
@@ -249,8 +251,27 @@
                     }
                 });
             });
+
+            // Generate thumbnail otomatis dari frame pertama video tanpa upload gambar
+            video.addEventListener('loadeddata', function() {
+                if (!this.getAttribute('poster')) {
+                    this.currentTime = 0.1;
+                }
+            });
+
+            video.addEventListener('seeked', function() {
+                if (!this.getAttribute('poster') && this.videoWidth > 0) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.videoWidth;
+                    canvas.height = this.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+                    this.setAttribute('poster', canvas.toDataURL('image/jpeg', 0.7));
+                }
+            }, { once: true });
         });
 
+        // 2. THREE.JS BACKGROUND SCENE
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
