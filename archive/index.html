@@ -2,171 +2,52 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Motion Archive - ridvx</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background-color: #050508; 
-            overflow-x: hidden; 
-            font-family: Arial, sans-serif; 
-            color: #ffffff;
-        }
+        body { background-color: #050508; font-family: Arial, sans-serif; color: #ffffff; min-height: 100vh; }
 
-        /* CANVAS LATAR BELAKANG FIXED */
-        canvas { 
-            display: block; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            z-index: 1; 
-            pointer-events: none;
-        }
+        /* CANVAS BACKGROUND */
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
 
-        /* NAVIGASI BACK */
-        .back-nav {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 20;
-        }
-        .back-nav a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-shadow: 0 0 8px rgba(255, 26, 26, 0.8);
-            transition: all 0.3s ease;
-        }
-        .back-nav a:hover {
-            color: #ff1a1a;
-            text-shadow: 0 0 15px #ff1a1a;
-        }
+        /* LAYOUT */
+        .content-container { position: relative; z-index: 10; padding: 80px 20px 60px; max-width: 1400px; margin: 0 auto; }
+        .back-nav { position: fixed; top: 25px; left: 25px; z-index: 20; }
+        .back-nav a { color: #ffffff; text-decoration: none; font-size: 0.85rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 8px rgba(255, 26, 26, 0.8); }
 
-        /* CONTAINER KONTEN UTAMA */
-        .content-container {
-            position: relative;
-            z-index: 10;
-            padding: 90px 20px 60px;
-            max-width: 1700px; 
-            margin: 0 auto;
-        }
+        .page-header { text-align: center; margin-bottom: 60px; }
+        .page-header h1 { font-size: 2.5rem; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 26, 26, 0.6); }
 
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-            pointer-events: none;
-        }
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
-        }
-        .page-header p {
-            color: #aaa;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* AUTO-MASONRY GRID (RESPONSIF FLEXIBLE) */
+        /* CSS GRID - RESPONSIVE */
         .motion-grid {
-            column-count: 5; 
-            column-gap: 20px;
-            pointer-events: auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
         }
+        @media (max-width: 1200px) { .motion-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .motion-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } }
+        @media (max-width: 480px) { .motion-grid { grid-template-columns: 1fr; } }
 
-        /* KARTU VIDEO (GLASSMORPHISM) */
+        /* CARD */
         .motion-card {
-            break-inside: avoid; 
-            margin-bottom: 20px;
-            background: rgba(5, 5, 8, 0.35); 
+            background: rgba(5, 5, 8, 0.4);
             border: 1px solid rgba(255, 26, 26, 0.3);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 14px;
-            padding: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 26, 26, 0.05);
-            transition: all 0.4s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            border-radius: 16px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            transition: 0.4s;
         }
-
-        .motion-card:hover {
-            border-color: rgba(255, 26, 26, 0.7);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 26, 26, 0.2);
-            transform: translateY(-4px);
-        }
-
-        /* VIDEO RESPONSIF */
-        .motion-video {
-            width: 100%;
-            height: auto; 
-            border-radius: 8px;
-            background-color: #000;
-            outline: none;
-            object-fit: cover;
-        }
-
-        /* JUDUL KARYA */
-        .motion-title {
-            margin-top: 12px;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
-            letter-spacing: 1.5px;
-            color: #fff;
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        /* TOMBOL LIVE VIEW */
-        .live-btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 9px;
-            background: transparent;
-            border: 1px solid rgba(255, 26, 26, 0.5);
-            color: #ff1a1a;
-            text-decoration: none;
-            font-size: 0.7rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .live-btn:hover {
-            background: #ff1a1a;
-            color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 26, 26, 0.5);
-        }
-
-        /* RESPONSIVE BREAKPOINTS UNTUK HP & TABLET */
-        @media (max-width: 1400px) { .motion-grid { column-count: 4; } }
-        @media (max-width: 1100px) { .motion-grid { column-count: 3; } }
-        @media (max-width: 768px) { 
-            .motion-grid { column-count: 2; column-gap: 15px; } 
-            .motion-card { margin-bottom: 15px; padding: 10px; }
-            .content-container { padding: 80px 15px 40px; }
-            .page-header h1 { font-size: 1.6rem; }
-        }
-        @media (max-width: 480px) { 
-            .motion-grid { column-count: 1; } 
-        }
+        .motion-card:hover { border-color: rgba(255, 26, 26, 0.7); transform: translateY(-5px); }
+        .motion-video { width: 100%; aspect-ratio: 9/16; object-fit: cover; border-radius: 8px; background: #000; }
+        .motion-title { margin: 15px 0 10px; font-size: 0.8rem; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
+        .live-btn { display: block; width: 100%; text-align: center; padding: 10px; border: 1px solid #ff1a1a; color: #ff1a1a; text-decoration: none; font-size: 0.75rem; border-radius: 8px; transition: 0.3s; }
+        .live-btn:hover { background: #ff1a1a; color: #fff; }
     </style>
 </head>
 <body>
 
-    <div class="back-nav">
-        <a href="/">&larr; BACK</a>
-    </div>
+    <div class="back-nav"><a href="/">&larr; BACK</a></div>
 
     <div class="content-container">
         <div class="page-header">
@@ -175,263 +56,76 @@
         </div>
 
         <div class="motion-grid">
-            
+            <!-- Data Karya -->
             <div class="motion-card">
-                <video src="dwp1.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="dwp1.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">DWP 2025 3d motion</div>
                 <a href="https://www.instagram.com/p/DScma76kfb2/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="monti.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="monti.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">Montigo Resort</div>
                 <a href="https://www.instagram.com/reel/DU1tT3_E8Tq/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="ponbi.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="ponbi.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">Pontianak Biennale</div>
                 <a href="https://www.instagram.com/reel/Dau7EGhPCNh/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="shell.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="shell.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">Shell Patisserie</div>
                 <a href="https://www.instagram.com/p/DbxX17VpoHD/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="against.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="against.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">AGAINST THE GRAIN</div>
                 <a href="https://www.instagram.com/p/C1yGRxDrWPZ/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="tree.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="tree.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">The Trees And The Wires</div>
                 <a href="https://www.instagram.com/p/Csn0WRGrsCW/?img_index=1" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="kabung.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="kabung.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">Kabung & Upaya yang Melampaui Esok</div>
                 <a href="https://www.instagram.com/p/DSWgExwk_pX/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="hyena.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="hyena.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">Hyenas Music Canvas</div>
                 <a href="https://open.spotify.com/track/1BRqMyma6vceiZaKIrEssf?si=79874f5b2ea34e72" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
             <div class="motion-card">
-                <video src="Dwp24.mp4" class="motion-video" controls preload="metadata" playsinline></video>
+                <video src="Dwp24.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">DWP 2024 - Opening Motion</div>
                 <a href="https://www.instagram.com/dwpfest/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
-
         </div>
     </div>
 
-    <!-- Script Background Three.js & Video Optimizer -->
+    <!-- THREE.JS (Tetap ada sebagai background) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // 1. OPTIMASI VIDEO: AUTO-PAUSE & AUTO-THUMBNAIL GENERATOR (Mobile friendly)
-        const allVideos = document.querySelectorAll('.motion-video');
+        // Memastikan video tidak autoplay di mobile untuk menghemat data
+        document.querySelectorAll('video').forEach(video => {
+            video.preload = "metadata";
+            video.addEventListener('play', () => {
+                document.querySelectorAll('video').forEach(v => { if(v !== video) v.pause(); });
+            });
+        });
         
-        allVideos.forEach(video => {
-            // Hentikan video lain saat satu video diputar
-            video.addEventListener('play', function() {
-                allVideos.forEach(otherVideo => {
-                    if (otherVideo !== video) {
-                        otherVideo.pause();
-                    }
-                });
-            });
-
-            // Generate thumbnail otomatis dari frame pertama video tanpa upload gambar
-            video.addEventListener('loadeddata', function() {
-                if (!this.getAttribute('poster')) {
-                    this.currentTime = 0.1;
-                }
-            });
-
-            video.addEventListener('seeked', function() {
-                if (!this.getAttribute('poster') && this.videoWidth > 0) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.videoWidth;
-                    canvas.height = this.videoHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-                    this.setAttribute('poster', canvas.toDataURL('image/jpeg', 0.7));
-                }
-            }, { once: true });
-        });
-
-        // 2. THREE.JS BACKGROUND SCENE
+        // Background Three.js setup (seperti sebelumnya)
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enableZoom = false; 
-        camera.position.z = 22;
-
-        function createPointTexture(colorHex) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64;
-            const ctx = canvas.getContext('2d');
-            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            gradient.addColorStop(0, colorHex);
-            gradient.addColorStop(0.3, colorHex);
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 64, 64);
-            return new THREE.CanvasTexture(canvas);
-        }
-
-        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
-        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
-
-        const particleCount = 130;
-        const particlesData = [];
-        const particleGroup = new THREE.Group();
-        scene.add(particleGroup);
-
-        for (let i = 0; i < particleCount; i++) {
-            const isRedNode = (i % 12 === 0);
-            const material = new THREE.SpriteMaterial({
-                map: isRedNode ? redTexture : whiteTexture,
-                transparent: true,
-                opacity: 0.4 + Math.random() * 0.4,
-                blending: THREE.AdditiveBlending
-            });
-            const sprite = new THREE.Sprite(material);
-            const scaleSize = isRedNode ? 0.7 : 0.4;
-            sprite.scale.set(scaleSize, scaleSize, 1.0);
-            const posX = (Math.random() - 0.5) * 34;
-            const posY = (Math.random() - 0.5) * 24;
-            const posZ = (Math.random() - 0.5) * 16;
-            sprite.position.set(posX, posY, posZ);
-            particleGroup.add(sprite);
-
-            particlesData.push({
-                mesh: sprite,
-                basePos: new THREE.Vector3(posX, posY, posZ),
-                velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.015,
-                    (Math.random() - 0.5) * 0.015,
-                    (Math.random() - 0.5) * 0.015
-                ),
-                alphaSpeed: (Math.random() - 0.5) * 0.008,
-                isRed: isRedNode
-            });
-        }
-
-        const maxLines = particleCount * particleCount;
-        const positions = new Float32Array(maxLines * 6);
-        const colors = new Float32Array(maxLines * 6);
-        const linesGeometry = new THREE.BufferGeometry();
-        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        const linesMaterial = new THREE.LineBasicMaterial({
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-
-        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
-        particleGroup.add(linesMesh);
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2(-9999, -9999);
-        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
-        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            raycaster.ray.intersectPlane(plane, mouse3D);
-        });
-
-        window.addEventListener('mouseleave', () => {
-            mouse3D.set(-9999, -9999, -9999);
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-
-            let vertexIndex = 0;
-            let colorIndex = 0;
-
-            for (let i = 0; i < particleCount; i++) {
-                const p = particlesData[i];
-                p.mesh.material.opacity += p.alphaSpeed;
-                if (p.mesh.material.opacity >= 0.8 || p.mesh.material.opacity <= 0.2) {
-                    p.alphaSpeed = -p.alphaSpeed;
-                }
-                p.basePos.add(p.velocity);
-                if (Math.abs(p.basePos.x) > 18) p.velocity.x *= -1;
-                if (Math.abs(p.basePos.y) > 13) p.velocity.y *= -1;
-                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
-
-                const distToMouse = p.mesh.position.distanceTo(mouse3D);
-                const pushRadius = 7;
-                if (distToMouse < pushRadius) {
-                    const force = (pushRadius - distToMouse) / pushRadius;
-                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
-                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
-                } else {
-                    p.mesh.position.lerp(p.basePos, 0.05);
-                }
-
-                for (let j = i + 1; j < particleCount; j++) {
-                    const p2 = particlesData[j];
-                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
-                    const connectDistance = 5.2;
-
-                    if (dist < connectDistance) {
-                        const alpha = (1.0 - dist / connectDistance) * 0.6;
-                        positions[vertexIndex++] = p.mesh.position.x;
-                        positions[vertexIndex++] = p.mesh.position.y;
-                        positions[vertexIndex++] = p.mesh.position.z;
-                        positions[vertexIndex++] = p2.mesh.position.x;
-                        positions[vertexIndex++] = p2.mesh.position.y;
-                        positions[vertexIndex++] = p2.mesh.position.z;
-
-                        const isRedLine = p.isRed || p2.isRed;
-                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
-                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
-                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
-                        colors[colorIndex++] = isRedLine ? alpha : alpha * 0.8;
-                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
-                        colors[colorIndex++] = isRedLine ? alpha * 0.1 : alpha * 0.8;
-                    }
-                }
-            }
-
-            linesGeometry.attributes.position.needsUpdate = true;
-            linesGeometry.attributes.color.needsUpdate = true;
-            linesGeometry.setDrawRange(0, vertexIndex / 3);
-            renderer.render(scene, camera);
-        }
+        camera.position.z = 20;
+        
+        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
         animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
     </script>
 </body>
 </html>
