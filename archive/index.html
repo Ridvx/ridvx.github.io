@@ -12,38 +12,47 @@
         canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
 
         /* Kontainer Utama */
-        .content-container { position: relative; z-index: 10; padding: 80px 20px 60px; max-width: 1200px; margin: 0 auto; }
+        .content-container { position: relative; z-index: 10; padding: 80px 20px 60px; max-width: 1700px; margin: 0 auto; }
         .back-nav { position: fixed; top: 25px; left: 25px; z-index: 20; }
         .back-nav a { color: #ffffff; text-decoration: none; font-size: 0.85rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 8px rgba(255, 26, 26, 0.8); }
 
-        .page-header { text-align: center; margin-bottom: 60px; }
+        .page-header { text-align: center; margin-bottom: 60px; pointer-events: none; }
         .page-header h1 { font-size: 2.5rem; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 26, 26, 0.6); }
+        .page-header p { color: #aaa; margin-top: 10px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* PINTEREST MASONRY LAYOUT */
+        /* PINTEREST STYLE (5 KOLOM DI DESKTOP) */
         .motion-grid {
-            column-width: 300px;
+            column-count: 5;
             column-gap: 20px;
+            pointer-events: auto;
         }
 
         .motion-card {
             display: inline-block;
             width: 100%;
             margin-bottom: 20px;
-            background: rgba(5, 5, 8, 0.6);
+            background: rgba(5, 5, 8, 0.5);
             border: 1px solid rgba(255, 26, 26, 0.3);
             border-radius: 16px;
             padding: 15px;
             break-inside: avoid;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             transition: 0.4s;
         }
-        .motion-card:hover { border-color: #ff1a1a; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 26, 26, 0.2); }
+        .motion-card:hover { border-color: rgba(255, 26, 26, 0.7); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(255, 26, 26, 0.15); }
 
         .motion-video { width: 100%; display: block; border-radius: 8px; background: #000; aspect-ratio: auto; }
         
         .motion-title { margin: 15px 0 10px; font-size: 0.8rem; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
         .live-btn { display: block; width: 100%; text-align: center; padding: 10px; border: 1px solid #ff1a1a; color: #ff1a1a; text-decoration: none; font-size: 0.75rem; border-radius: 8px; transition: 0.3s; }
-        .live-btn:hover { background: #ff1a1a; color: #fff; }
+        .live-btn:hover { background: #ff1a1a; color: #fff; box-shadow: 0 0 15px rgba(255, 26, 26, 0.5); }
+
+        /* RESPONSIF BREAKPOINTS */
+        @media (max-width: 1400px) { .motion-grid { column-count: 4; } }
+        @media (max-width: 1100px) { .motion-grid { column-count: 3; } }
+        @media (max-width: 768px)  { .motion-grid { column-count: 2; column-gap: 15px; } .content-container { padding: 80px 15px 40px; } }
+        @media (max-width: 480px)  { .motion-grid { column-count: 1; } }
     </style>
 </head>
 <body>
@@ -57,7 +66,7 @@
         </div>
 
         <div class="motion-grid">
-            <!-- List Karya -->
+            <!-- Daftar Karya -->
             <div class="motion-card">
                 <video src="dwp1.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">DWP 2025 3d motion</div>
@@ -106,29 +115,42 @@
         </div>
     </div>
 
-    <!-- Script Utama -->
+    <!-- Script Pendukung -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // Optimasi Video: Auto-pause & Aspect Ratio dinamis
+        // Penyesuaian aspek rasio video otomatis & Auto-pause video lain saat diputar
         document.querySelectorAll('.motion-video').forEach(video => {
             video.addEventListener('loadedmetadata', function() {
                 this.style.aspectRatio = `${this.videoWidth} / ${this.videoHeight}`;
             });
-            video.addEventListener('play', () => {
-                document.querySelectorAll('.motion-video').forEach(v => { if(v !== video) v.pause(); });
+            video.addEventListener('play', function() {
+                document.querySelectorAll('.motion-video').forEach(otherVideo => {
+                    if (otherVideo !== video) otherVideo.pause();
+                });
             });
         });
 
-        // Background Three.js
+        // 3D Background Three.js
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
-        camera.position.z = 20;
-        
-        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+        camera.position.z = 22;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
         animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
