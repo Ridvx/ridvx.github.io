@@ -26,8 +26,8 @@
         /* NAVIGASI BACK */
         .back-nav {
             position: fixed;
-            top: 25px;
-            left: 25px;
+            top: 20px;
+            left: 20px;
             z-index: 20;
         }
         .back-nav a {
@@ -48,48 +48,48 @@
         .content-container {
             position: relative;
             z-index: 10;
-            padding: 100px 40px 80px;
+            padding: 90px 20px 60px;
             max-width: 1700px; 
             margin: 0 auto;
         }
 
         .page-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             pointer-events: none;
         }
         .page-header h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             color: #ffffff;
             text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
         }
         .page-header p {
             color: #aaa;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            margin-top: 8px;
+            font-size: 0.8rem;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        /* AUTO-MASONRY GRID (5 KOLOM OTOMATIS) */
+        /* AUTO-MASONRY GRID (RESPONSIF FLEXIBLE) */
         .motion-grid {
             column-count: 5; 
-            column-gap: 24px;
+            column-gap: 20px;
             pointer-events: auto;
         }
 
         /* KARTU VIDEO (GLASSMORPHISM) */
         .motion-card {
             break-inside: avoid; 
-            margin-bottom: 24px;
-            background: rgba(5, 5, 8, 0.25); 
+            margin-bottom: 20px;
+            background: rgba(5, 5, 8, 0.35); 
             border: 1px solid rgba(255, 26, 26, 0.3);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-radius: 16px;
-            padding: 15px;
+            border-radius: 14px;
+            padding: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 26, 26, 0.05);
             transition: all 0.4s ease;
             display: flex;
@@ -100,10 +100,10 @@
         .motion-card:hover {
             border-color: rgba(255, 26, 26, 0.7);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 26, 26, 0.2);
-            transform: translateY(-5px);
+            transform: translateY(-4px);
         }
 
-        /* VIDEO OTOMATIS MENYESUAIKAN ASPEK RASIO ASLI */
+        /* VIDEO RESPONSIF */
         .motion-video {
             width: 100%;
             height: auto; 
@@ -115,10 +115,10 @@
 
         /* JUDUL KARYA */
         .motion-title {
-            margin-top: 15px;
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
             color: #fff;
             text-align: center;
             font-weight: bold;
@@ -130,12 +130,12 @@
             display: block;
             width: 100%;
             text-align: center;
-            padding: 10px;
+            padding: 9px;
             background: transparent;
             border: 1px solid rgba(255, 26, 26, 0.5);
             color: #ff1a1a;
             text-decoration: none;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
             letter-spacing: 2px;
             border-radius: 8px;
@@ -148,14 +148,18 @@
             box-shadow: 0 0 15px rgba(255, 26, 26, 0.5);
         }
 
-        /* RESPONSIVE BREAKPOINTS */
+        /* RESPONSIVE BREAKPOINTS UNTUK HP & TABLET */
         @media (max-width: 1400px) { .motion-grid { column-count: 4; } }
         @media (max-width: 1100px) { .motion-grid { column-count: 3; } }
         @media (max-width: 768px) { 
-            .motion-grid { column-count: 2; } 
-            .content-container { padding: 90px 20px 60px; }
+            .motion-grid { column-count: 2; column-gap: 15px; } 
+            .motion-card { margin-bottom: 15px; padding: 10px; }
+            .content-container { padding: 80px 15px 40px; }
+            .page-header h1 { font-size: 1.6rem; }
         }
-        @media (max-width: 500px) { .motion-grid { column-count: 1; } }
+        @media (max-width: 480px) { 
+            .motion-grid { column-count: 1; } 
+        }
     </style>
 </head>
 <body>
@@ -226,7 +230,6 @@
                 <a href="https://www.instagram.com/dwpfest/" target="_blank" class="live-btn">LIVE VIEW</a>
             </div>
 
-
         </div>
     </div>
 
@@ -234,7 +237,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // 1. OPTIMASI VIDEO: AUTO-PAUSE & AUTO-THUMBNAIL GENERATOR
+        // 1. OPTIMASI VIDEO: AUTO-PAUSE & AUTO-THUMBNAIL GENERATOR (Mobile friendly)
         const allVideos = document.querySelectorAll('.motion-video');
         
         allVideos.forEach(video => {
