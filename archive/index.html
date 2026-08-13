@@ -6,48 +6,40 @@
     <title>Motion Archive - ridvx</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #050508; font-family: Arial, sans-serif; color: #ffffff; min-height: 100vh; }
+        body { background-color: #050508; font-family: Arial, sans-serif; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
+        /* Latar Belakang Three.js */
         canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
 
-        .content-container { position: relative; z-index: 10; padding: 80px 20px 60px; max-width: 1400px; margin: 0 auto; }
+        /* Kontainer Utama */
+        .content-container { position: relative; z-index: 10; padding: 80px 20px 60px; max-width: 1200px; margin: 0 auto; }
         .back-nav { position: fixed; top: 25px; left: 25px; z-index: 20; }
         .back-nav a { color: #ffffff; text-decoration: none; font-size: 0.85rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 8px rgba(255, 26, 26, 0.8); }
 
         .page-header { text-align: center; margin-bottom: 60px; }
         .page-header h1 { font-size: 2.5rem; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 26, 26, 0.6); }
 
-        /* GRID RESPONSIVE */
+        /* PINTEREST MASONRY LAYOUT */
         .motion-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            align-items: start;
+            column-width: 300px;
+            column-gap: 20px;
         }
-        @media (max-width: 1200px) { .motion-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 768px) { .motion-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } }
-        @media (max-width: 480px) { .motion-grid { grid-template-columns: 1fr; } }
 
-        /* CARD & VIDEO */
         .motion-card {
-            background: rgba(5, 5, 8, 0.4);
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+            background: rgba(5, 5, 8, 0.6);
             border: 1px solid rgba(255, 26, 26, 0.3);
             border-radius: 16px;
             padding: 15px;
+            break-inside: avoid;
             backdrop-filter: blur(10px);
             transition: 0.4s;
         }
-        .motion-card:hover { border-color: rgba(255, 26, 26, 0.7); transform: translateY(-5px); }
-        
-        .motion-video { 
-            width: 100%; 
-            display: block;
-            border-radius: 8px; 
-            background: #000; 
-            /* Menyesuaikan rasio otomatis */
-            aspect-ratio: auto; 
-            min-height: 150px;
-        }
+        .motion-card:hover { border-color: #ff1a1a; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 26, 26, 0.2); }
+
+        .motion-video { width: 100%; display: block; border-radius: 8px; background: #000; aspect-ratio: auto; }
         
         .motion-title { margin: 15px 0 10px; font-size: 0.8rem; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
         .live-btn { display: block; width: 100%; text-align: center; padding: 10px; border: 1px solid #ff1a1a; color: #ff1a1a; text-decoration: none; font-size: 0.75rem; border-radius: 8px; transition: 0.3s; }
@@ -65,7 +57,7 @@
         </div>
 
         <div class="motion-grid">
-            <!-- Daftar Karya -->
+            <!-- List Karya -->
             <div class="motion-card">
                 <video src="dwp1.mp4" class="motion-video" controls playsinline></video>
                 <div class="motion-title">DWP 2025 3d motion</div>
@@ -114,21 +106,19 @@
         </div>
     </div>
 
+    <!-- Script Utama -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // Skrip untuk menyesuaikan rasio video berdasarkan file asli
+        // Optimasi Video: Auto-pause & Aspect Ratio dinamis
         document.querySelectorAll('.motion-video').forEach(video => {
             video.addEventListener('loadedmetadata', function() {
-                // Set aspect ratio sesuai dimensi asli file video
                 this.style.aspectRatio = `${this.videoWidth} / ${this.videoHeight}`;
             });
-            
-            // Auto-pause video lain
             video.addEventListener('play', () => {
                 document.querySelectorAll('.motion-video').forEach(v => { if(v !== video) v.pause(); });
             });
         });
-        
+
         // Background Three.js
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
