@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Statement - Ridvx Visual</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #050508; 
+            overflow-x: hidden; 
+            font-family: Arial, sans-serif; 
+            color: #ffffff;
+            user-select: none;
+        }
+
+        /* CANVAS LATAR BELAKANG FIXED */
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        /* NAVIGASI BACK */
+        .back-nav {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 20;
+        }
+        .back-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(255, 26, 26, 0.8);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .back-nav a:hover {
+            color: #ff1a1a;
+            text-shadow: 0 0 15px #ff1a1a;
+        }
+
+        /* CONTAINER KONTEN UTAMA */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 120px 20px 80px;
+            max-width: 950px; 
+            margin: 0 auto;
+            pointer-events: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+        }
+        .page-header p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* KOTAK STATEMENT (GLASSMORPHISM) */
+        .statement-box {
+            background: rgba(5, 5, 8, 0.65); 
+            border: 1px solid rgba(255, 26, 26, 0.35);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 16px;
+            padding: 45px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 26, 26, 0.08);
+            line-height: 1.9;
+        }
+
+        .statement-box p {
+            color: #d1d1d6;
+            font-size: 1.02rem;
+            margin-bottom: 24px;
+            text-align: justify;
+            letter-spacing: 0.5px;
+        }
+
+        .statement-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* RESPONSIF UNTUK HP */
+        @media (max-width: 768px) {
+            .content-container {
+                padding: 100px 20px 50px;
+            }
+            .statement-box {
+                padding: 25px;
+            }
+            .statement-box p {
+                font-size: 0.95rem;
+            }
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="/">&larr; BACK</a>
+    </div>
+
+    <div class="content-container">
+        <div class="page-header">
+            <h1>ARTIST STATEMENT</h1>
+            <p>RIDVX VISUAL</p>
+        </div>
+
+        <div class="statement-box">
+            <p>
+                I am a new media artist, visual jockey (VJ), and motion graphics designer based in Tulungagung, East Java. My artistic practice moves between motion graphics, projection mapping, and new media installations—mediums that I use not merely as presentation tools, but as a language to translate local issues into audiovisual experiences that can be directly felt by the body and senses. Tulungagung, the place where I live and work, serves as my personal laboratory to explore the intersection between animism and algorithms. Technology, in my practice, does not come to replace local ancestral values and spirituality, but rather serves as a new vessel to preserve them. That intersection is the core of my concept.
+            </p>
+            <p>
+                I translate this idea through a working method that believes research-based art does not need to be oversimplified to be understood. Complexity can instead be presented wholly through media art—by breaking down a grand concept into fragments of mediums (light, sound, motion, objects) that are reassembled within a single installation. The audience does not receive a ready-made conclusion, but is invited to piece together those fragments into meaning themselves. For me, that is how research transforms into an experience, rather than mere information.
+            </p>
+            <p>
+                It is this same method of breaking down and reassembling that I use to trace the relationship between technology and science and their impact on humanity—questions regarding how the tools we create silently alter the way we think, believe, and connect with one another. Likewise, my works strive to present these questions not as a frightening warning, but as a shared space for reflection: to what extent do we still hold control over the technology we create, and to what extent does it shape us in return.
+            </p>
+        </div>
+    </div>
+
+    <!-- CDN Three.js & Audio Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // 1. INSTANT UNLOCK AUDIO ENGINE
+        let audioCtx = null;
+        let isAudioUnlocked = false;
+
+        function unlockAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!isAudioUnlocked && audioCtx.state === 'running') {
+                isAudioUnlocked = true;
+                playTone(440, 0.2, 'sawtooth');
+            }
+        }
+
+        ['click', 'mousedown', 'mouseup', 'keydown', 'touchstart', 'mousemove'].forEach(eventType => {
+            window.addEventListener(eventType, unlockAudio, { once: false });
+        });
+
+        function playTone(freq, duration = 0.12, type = 'sine') {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.32, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        // 2. THREE.JS BACKGROUND SCENE DENGAN EFEK INTERAKTIF MERAH DI KURSOR
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false; 
+        camera.position.z = 22;
+
+        function createPointTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, colorHex);
+            gradient.addColorStop(0.3, colorHex);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
+        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
+
+        const particleCount = 130;
+        const particlesData = [];
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+
+        for (let i = 0; i < particleCount; i++) {
+            const isRedNode = (i % 12 === 0);
+            const material = new THREE.SpriteMaterial({
+                map: isRedNode ? redTexture : whiteTexture,
+                transparent: true,
+                opacity: 0.4 + Math.random() * 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const sprite = new THREE.Sprite(material);
+            const scaleSize = isRedNode ? 0.7 : 0.4;
+            sprite.scale.set(scaleSize, scaleSize, 1.0);
+            const posX = (Math.random() - 0.5) * 34;
+            const posY = (Math.random() - 0.5) * 24;
+            const posZ = (Math.random() - 0.5) * 16;
+            sprite.position.set(posX, posY, posZ);
+            particleGroup.add(sprite);
+
+            particlesData.push({
+                mesh: sprite,
+                basePos: new THREE.Vector3(posX, posY, posZ),
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015
+                ),
+                alphaSpeed: (Math.random() - 0.5) * 0.008,
+                isRed: isRedNode
+            });
+        }
+
+        const maxLines = particleCount * particleCount;
+        const positions = new Float32Array(maxLines * 6);
+        const colors = new Float32Array(maxLines * 6);
+        const linesGeometry = new THREE.BufferGeometry();
+        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const linesMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+        particleGroup.add(linesMesh);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(-9999, -9999);
+        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+        let lastMoveTime = 0;
+        window.addEventListener('mousemove', (e) => {
+            unlockAudio();
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, mouse3D);
+
+            const now = Date.now();
+            if (now - lastMoveTime > 140) {
+                const freq = 180 + Math.abs((e.clientX + e.clientY) % 500);
+                playTone(freq, 0.08, 'sine');
+                lastMoveTime = now;
+            }
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse3D.set(-9999, -9999, -9999);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            let vertexIndex = 0;
+            let colorIndex = 0;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = particlesData[i];
+                p.mesh.material.opacity += p.alphaSpeed;
+                if (p.mesh.material.opacity >= 0.8 || p.mesh.material.opacity <= 0.2) {
+                    p.alphaSpeed = -p.alphaSpeed;
+                }
+                p.basePos.add(p.velocity);
+                if (Math.abs(p.basePos.x) > 18) p.velocity.x *= -1;
+                if (Math.abs(p.basePos.y) > 13) p.velocity.y *= -1;
+                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
+
+                const distToMouse = p.mesh.position.distanceTo(mouse3D);
+                const pushRadius = 7;
+                const isNearMouse = distToMouse < pushRadius;
+
+                if (isNearMouse) {
+                    const force = (pushRadius - distToMouse) / pushRadius;
+                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
+                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
+                    p.mesh.material.map = redTexture;
+                } else {
+                    p.mesh.position.lerp(p.basePos, 0.05);
+                    p.mesh.material.map = p.isRed ? redTexture : whiteTexture;
+                }
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2 = particlesData[j];
+                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
+                    const connectDistance = 5.2;
+
+                    if (dist < connectDistance) {
+                        const alpha = (1.0 - dist / connectDistance) * 0.6;
+                        positions[vertexIndex++] = p.mesh.position.x;
+                        positions[vertexIndex++] = p.mesh.position.y;
+                        positions[vertexIndex++] = p.mesh.position.z;
+                        positions[vertexIndex++] = p2.mesh.position.x;
+                        positions[vertexIndex++] = p2.mesh.position.y;
+                        positions[vertexIndex++] = p2.mesh.position.z;
+
+                        const isLineNearMouse = isNearMouse || (p2.mesh.position.distanceTo(mouse3D) < pushRadius);
+                        const isRedLine = p.isRed || p2.isRed || isLineNearMouse;
+
+                        const rColor = isRedLine ? 1.0 : alpha * 0.8;
+                        const gColor = isRedLine ? 0.1 : alpha * 0.8;
+                        const bColor = isRedLine ? 0.1 : alpha * 0.8;
+
+                        colors[colorIndex++] = rColor;
+                        colors[colorIndex++] = gColor;
+                        colors[colorIndex++] = bColor;
+                        colors[colorIndex++] = rColor;
+                        colors[colorIndex++] = gColor;
+                        colors[colorIndex++] = bColor;
+                    }
+                }
+            }
+
+            linesGeometry.attributes.position.needsUpdate = true;
+            linesGeometry.attributes.color.needsUpdate = true;
+            linesGeometry.setDrawRange(0, vertexIndex / 3);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
