@@ -1,1 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Video Sutter - Beri Waktu (Official Visualizer)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #050508; 
+            overflow-x: hidden; 
+            font-family: Arial, sans-serif; 
+            color: #ffffff;
+            user-select: none;
+        }
+
+        /* CANVAS LATAR BELAKANG FIXED */
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        /* NAVIGASI BACK */
+        .back-nav {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 20;
+        }
+        .back-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(255, 26, 26, 0.8);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .back-nav a:hover {
+            color: #ff1a1a;
+            text-shadow: 0 0 15px #ff1a1a;
+        }
+
+        /* CONTAINER KONTEN UTAMA */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 100px 40px 80px;
+            max-width: 1200px; 
+            margin: 0 auto;
+            pointer-events: auto;
+        }
+
+        /* HEADER PROYEK */
+        .project-header {
+            margin-bottom: 40px;
+        }
+        .project-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .project-meta {
+            display: flex;
+            gap: 30px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #a0a0a5;
+            text-transform: uppercase;
+        }
+        .project-meta span span {
+            color: #ff1a1a;
+            font-weight: bold;
+        }
+
+        /* MEDIA UTAMA (PROJEK BESAR YOUTUBE) */
+        .project-hero-media {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 26, 26, 0.1);
+            margin-bottom: 50px;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+        }
+        .project-hero-media iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* KONTEN ARTIKEL & DESKRIPSI */
+        .project-grid-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .project-description h3 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        .project-description p {
+            color: #c0c0c5;
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* DETAIL INFO SAMPING */
+        .project-sidebar {
+            background: rgba(10, 10, 15, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+            padding: 30px;
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .sidebar-item {
+            margin-bottom: 20px;
+        }
+        .sidebar-item:last-child {
+            margin-bottom: 0;
+        }
+        .sidebar-label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .sidebar-value {
+            font-size: 0.95rem;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* GALERI PENDUKUNG (UKURAN KECIL, 3 KOLOM) */
+        .sub-gallery-section {
+            margin-top: 40px;
+        }
+        .sub-gallery-title {
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-left: 3px solid #ff1a1a;
+            padding-left: 15px;
+        }
+        
+        .sub-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .sub-gallery-item {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 26, 26, 0.25);
+            background: #111;
+            aspect-ratio: 16 / 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        .sub-gallery-item:hover {
+            border-color: rgba(255, 26, 26, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 26, 26, 0.2);
+        }
+        .sub-gallery-item img,
+        .sub-gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .sub-gallery-item:hover img,
+        .sub-gallery-item:hover video {
+            transform: scale(1.05);
+        }
+
+        /* RESPONSIF UNTUK HP / TABLET */
+        @media (max-width: 900px) {
+            .project-grid-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .sub-gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-container {
+                padding: 90px 20px 50px;
+            }
+            .project-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="/portfolio/">&larr; BACK</a>
+    </div>
+
+    <div class="content-container">
+        
+        <!-- HEADER PROYEK -->
+        <div class="project-header">
+            <h1 class="project-title">Sutter - Beri Waktu (Official Visualizer)</h1>
+            <div class="project-meta">
+                <span>Category: <span>Animation Music Video</span></span>
+                <span>Year: <span>2023</span></span>
+            </div>
+        </div>
+
+        <!-- MEDIA UTAMA (YOUTUBE EMBED: TIDAK AUTOPLAY, TIDAK MUTE) -->
+        <div class="project-hero-media">
+            <iframe 
+                src="https://www.youtube.com/embed/1C5tuznFZO4?autoplay=0&mute=0" 
+                title="Project Video" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <!-- DETAIL KONTEN & SIDEBAR -->
+        <div class="project-grid-content">
+            <div class="project-description">
+                <h3>About The Project</h3>
+                <p>
+               I worked on all the animation for the official visualizer for Sutter's song 'Beri Waktu'. Here, I created a realistic concept and 3D animation that perfectly matches the song. This project showcases my simple visuals, yet still supports the message of the music.
+                </p>
+            </div>
+
+            <div class="project-sidebar">
+                <div class="sidebar-item">
+                    <div class="sidebar-label">Scope of Work</div>
+                    <div class="sidebar-value">Animation Music Video</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GALERI PENDUKUNG (1 VIDEO KECIL & 2 GAMBAR KECIL) -->
+        <div class="sub-gallery-section">
+            <div class="sub-gallery-title">Project Gallery</div>
+            <div class="sub-gallery-grid">
+                
+                <!-- Galeri 1: Gambar Kecil Pertama -->
+                <div class="sub-gallery-item">
+                    <img src="port222.png" alt="Detail View 1">
+                </div>
+
+                <!-- Galeri 2: Video Kecil -->
+                <div class="sub-gallery-item">
+                    <img src="port333.png" alt="Detail View 2">
+                </div>
+
+                <!-- Galeri 3: Gambar Kecil Kedua -->
+                <div class="sub-gallery-item">
+                    <img src="port444.png" alt="Detail View 3">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CDN Three.js & Script Pendukung (Tanpa Suara Mouse Move) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // THREE.JS BACKGROUND SCENE
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false; 
+        camera.position.z = 22;
+
+        function createPointTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, colorHex);
+            gradient.addColorStop(0.3, colorHex);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const whiteTexture = createPointTexture('rgba(255, 255, 255, 1)');
+        const redTexture = createPointTexture('rgba(255, 26, 26, 1)');
+
+        const particleCount = 130;
+        const particlesData = [];
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+
+        for (let i = 0; i < particleCount; i++) {
+            const isRedNode = (i % 12 === 0);
+            const material = new THREE.SpriteMaterial({
+                map: isRedNode ? redTexture : whiteTexture,
+                transparent: true,
+                opacity: 0.4 + Math.random() * 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const sprite = new THREE.Sprite(material);
+            const scaleSize = isRedNode ? 0.7 : 0.4;
+            sprite.scale.set(scaleSize, scaleSize, 1.0);
+            const posX = (Math.random() - 0.5) * 34;
+            const posY = (Math.random() - 0.5) * 24;
+            const posZ = (Math.random() - 0.5) * 16;
+            sprite.position.set(posX, posY, posZ);
+            particleGroup.add(sprite);
+
+            particlesData.push({
+                mesh: sprite,
+                basePos: new THREE.Vector3(posX, posY, posZ),
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015
+                ),
+                alphaSpeed: (Math.random() - 0.5) * 0.008,
+                isRed: isRedNode
+            });
+        }
+
+        const maxLines = particleCount * particleCount;
+        const positions = new Float32Array(maxLines * 6);
+        const colors = new Float32Array(maxLines * 6);
+        const linesGeometry = new THREE.BufferGeometry();
+        linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        linesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const linesMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+        particleGroup.add(linesMesh);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(-9999, -9999);
+        const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, mouse3D);
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse3D.set(-9999, -9999, -9999);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            let vertexIndex = 0;
+            let colorIndex = 0;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = particlesData[i];
+                p.mesh.material.opacity += p.alphaSpeed;
+                if (p.mesh.material.opacity >= 0.8 || p.mesh.material.opacity <= 0.2) {
+                    p.alphaSpeed = -p.alphaSpeed;
+                }
+                p.basePos.add(p.velocity);
+                if (Math.abs(p.basePos.x) > 18) p.velocity.x *= -1;
+                if (Math.abs(p.basePos.y) > 13) p.velocity.y *= -1;
+                if (Math.abs(p.basePos.z) > 9) p.velocity.z *= -1;
+
+                const distToMouse = p.mesh.position.distanceTo(mouse3D);
+                const pushRadius = 7;
+                const isNearMouse = distToMouse < pushRadius;
+
+                if (isNearMouse) {
+                    const force = (pushRadius - distToMouse) / pushRadius;
+                    const dir = p.mesh.position.clone().sub(mouse3D).normalize();
+                    p.mesh.position.add(dir.multiplyScalar(force * 0.35));
+                    p.mesh.material.map = redTexture;
+                } else {
+                    p.mesh.position.lerp(p.basePos, 0.05);
+                    p.mesh.material.map = p.isRed ? redTexture : whiteTexture;
+                }
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2 = particlesData[j];
+                    const dist = p.mesh.position.distanceTo(p2.mesh.position);
+                    const connectDistance = 5.2;
+
+                    if (dist < connectDistance) {
+                        const alpha = (1.0 - dist / connectDistance) * 0.6;
+                        positions[vertexIndex++] = p.mesh.position.x;
+                        positions[vertexIndex++] = p.mesh.position.y;
+                        positions[vertexIndex++] = p.mesh.position.z;
+                        positions[vertexIndex++] = p2.mesh.position.x;
+                        positions[vertexIndex++] = p2.mesh.position.y;
+                        positions[vertexIndex++] = p2.mesh.position.z;
+
+                        const isLineNearMouse = isNearMouse || (p2.mesh.position.distanceTo(mouse3D) < pushRadius);
+                        const isRedLine = p.isRed || p2.isRed || isLineNearMouse;
+
+                        const rColor = isRedLine ? 1.0 : alpha * 0.8;
+                        const gColor = isRedLine ? 0.1 : alpha * 0.8;
+                        const bColor = isRedLine ? 0.1 : alpha * 0.8;
+
+                        colors[colorIndex++] = rColor;
+                        colors[colorIndex++] = gColor;
+                        colors[colorIndex++] = bColor;
+                        colors[colorIndex++] = rColor;
+                        colors[colorIndex++] = gColor;
+                        colors[colorIndex++] = bColor;
+                    }
+                }
+            }
+
+            linesGeometry.attributes.position.needsUpdate = true;
+            linesGeometry.attributes.color.needsUpdate = true;
+            linesGeometry.setDrawRange(0, vertexIndex / 3);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+
 
