@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Video Febinda Tito - Aku Kau Sia Sia </title>
+    <title>Music Video Febinda Tito - Aku Kau Sia Sia</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -82,7 +82,7 @@
             font-weight: bold;
         }
 
-        /* MEDIA UTAMA (PROJEK BESAR) */
+        /* MEDIA UTAMA (PROJEK BESAR YOUTUBE) */
         .project-hero-media {
             width: 100%;
             border-radius: 16px;
@@ -91,13 +91,17 @@
             border: 1px solid rgba(255, 26, 26, 0.3);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 26, 26, 0.1);
             margin-bottom: 50px;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
         }
-        .project-hero-media video,
-        .project-hero-media img {
+        .project-hero-media iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+            height: 100%;
+            border: none;
         }
 
         /* KONTEN ARTIKEL & DESKRIPSI */
@@ -165,7 +169,6 @@
             padding-left: 15px;
         }
         
-        /* Grid galeri diatur agar thumbnail kecil dan pas */
         .sub-gallery-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -232,12 +235,11 @@
             </div>
         </div>
 
-        <!-- MEDIA UTAMA (PROJEK BESAR) -->
-       <div class="project-hero-media" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+        <!-- MEDIA UTAMA (YOUTUBE EMBED: TIDAK AUTOPLAY, TIDAK MUTE) -->
+        <div class="project-hero-media">
             <iframe 
-                src="https://www.youtube.com/embed/3sgb-CkFJJk?autoplay=0&mute=0&loop=1&playlist=3sgb-CkFJJk" 
+                src="https://www.youtube.com/embed/3sgb-CkFJJk?autoplay=0&mute=0" 
                 title="Project Video" 
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen>
             </iframe>
@@ -248,36 +250,36 @@
             <div class="project-description">
                 <h3>About The Project</h3>
                 <p>
-          In this official visualizer project for Febinda Tito’s "Aku Kau Sia-Sia," I contributed as a key member of the creative team, specializing in VJing and projection mapping. My role involved crafting immersive visual narratives that resonate with the song's melancholic atmosphere, where I executed real-time VJ performances and collaborated on the technical implementation of projection mapping to transform the environment into a dynamic canvas. This project showcases my ability to blend new media art with musical storytelling to create a cohesive and engaging audio-visual experience.
+                    In this official visualizer project for Febinda Tito’s "Aku Kau Sia-Sia," I contributed as a key member of the creative team, specializing in VJing and projection mapping. My role involved crafting immersive visual narratives that resonate with the song's melancholic atmosphere, where I executed real-time VJ performances and collaborated on the technical implementation of projection mapping to transform the environment into a dynamic canvas. This project showcases my ability to blend new media art with musical storytelling to create a cohesive and engaging audio-visual experience.
                 </p>
             </div>
 
             <div class="project-sidebar">
-                      <div class="sidebar-item" style="margin-top: 20px;">
+                <div class="sidebar-item">
                     <div class="sidebar-label">Scope of Work</div>
                     <div class="sidebar-value">VJ, Projection Mapping</div>
                 </div>
             </div>
         </div>
 
-        <!-- GALERI PENDUKUNG (BERISI 1 VIDEO KECIL & 2 GAMBAR KECIL) -->
+        <!-- GALERI PENDUKUNG (1 VIDEO KECIL & 2 GAMBAR KECIL) -->
         <div class="sub-gallery-section">
             <div class="sub-gallery-title">Project Gallery</div>
             <div class="sub-gallery-grid">
                 
                 <!-- Galeri 1: Gambar Kecil Pertama -->
                 <div class="sub-gallery-item">
-                    <img src="img1.jpg" alt="Detail View 1">
+                    <img src="port2.png" alt="Detail View 1">
                 </div>
 
                 <!-- Galeri 2: Video Kecil -->
                 <div class="sub-gallery-item">
-                    <video src="monti.mp4" controls muted playsinline preload="metadata"></video>
+                    <img src="port3.png" alt="Detail View 2">
                 </div>
 
                 <!-- Galeri 3: Gambar Kecil Kedua -->
                 <div class="sub-gallery-item">
-                    <img src="img2.jpg" alt="Detail View 2">
+                    <img src="port4.png" alt="Detail View 3">
                 </div>
 
             </div>
@@ -285,49 +287,10 @@
 
     </div>
 
-    <!-- CDN Three.js & Script Pendukung -->
+    <!-- CDN Three.js & Script Pendukung (Tanpa Suara Mouse Move) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // INSTANT UNLOCK AUDIO ENGINE
-        let audioCtx = null;
-        let isAudioUnlocked = false;
-
-        function unlockAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            if (!isAudioUnlocked && audioCtx.state === 'running') {
-                isAudioUnlocked = true;
-                playTone(440, 0.2, 'sawtooth');
-            }
-        }
-
-        ['click', 'mousedown', 'mouseup', 'keydown', 'touchstart', 'mousemove'].forEach(eventType => {
-            window.addEventListener(eventType, unlockAudio, { once: false });
-        });
-
-        function playTone(freq, duration = 0.12, type = 'sine') {
-            if (!audioCtx || audioCtx.state !== 'running') return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.32, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {
-                console.log(e);
-            }
-        }
-
         // THREE.JS BACKGROUND SCENE
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -415,20 +378,11 @@
         const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
-        let lastMoveTime = 0;
         window.addEventListener('mousemove', (e) => {
-            unlockAudio();
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             raycaster.ray.intersectPlane(plane, mouse3D);
-
-            const now = Date.now();
-            if (now - lastMoveTime > 140) {
-                const freq = 180 + Math.abs((e.clientX + e.clientY) % 500);
-                playTone(freq, 0.08, 'sine');
-                lastMoveTime = now;
-            }
         });
 
         window.addEventListener('mouseleave', () => {
