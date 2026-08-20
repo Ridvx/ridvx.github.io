@@ -69,17 +69,17 @@
             text-transform: uppercase;
         }
 
-        /* MASONRY GRID (4 KOLOM PAS DI DESKTOP) & OTOMATIS MENAMBAH KE BAWAH */
+        /* PINTEREST MASONRY GRID (4 KOLOM DENGAN TINGGI BERVARIASI) */
         .portfolio-grid {
-            column-count: 4; 
-            column-gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            grid-auto-rows: 10px; /* Unit kecil untuk mengatur tinggi dinamis per item */
             pointer-events: auto;
         }
 
         /* KARTU PORTFOLIO */
         .portfolio-card {
-            break-inside: avoid;
-            margin-bottom: 20px;
             position: relative;
             border-radius: 12px;
             overflow: hidden;
@@ -89,6 +89,7 @@
             transition: all 0.4s ease;
             display: block;
             text-decoration: none;
+            /* Tinggi akan dihitung otomatis oleh Javascript berdasarkan rasio gambar */
         }
 
         .portfolio-card:hover {
@@ -106,12 +107,12 @@
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.4s ease, opacity 0.4s ease;
         }
 
-        /* OVERLAY TRANSPARAN (TIDAK FULL HILANG) SAAT HOVER */
+        /* OVERLAY TRANSPARAN SAAT HOVER */
         .portfolio-card::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 8, 0.45); /* Transparan tipis, background/gambar tetap terlihat */
+            background: rgba(5, 5, 8, 0.45);
             opacity: 0;
             transition: opacity 0.4s ease;
             z-index: 2;
@@ -132,17 +133,17 @@
 
         .portfolio-title {
             color: #ffffff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
         }
 
         .portfolio-desc {
             color: #d1d1d6;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             line-height: 1.4;
             letter-spacing: 0.5px;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
@@ -152,7 +153,7 @@
         .portfolio-card:hover .portfolio-media {
             transform: scale(1.05);
             filter: blur(2px);
-            opacity: 0.6; /* Gambar tetap terlihat samar di belakang overlay transparan */
+            opacity: 0.6;
         }
 
         .portfolio-card:hover::after {
@@ -164,11 +165,11 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* RESPONSIF BREAKPOINTS OTOMATIS */
-        @media (max-width: 1200px) { .portfolio-grid { column-count: 3; } }
-        @media (max-width: 900px)  { .portfolio-grid { column-count: 2; } }
+        /* RESPONSIF OTOMATIS BERDASARKAN UKURAN LAYAR */
+        @media (max-width: 1200px) { .portfolio-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 900px)  { .portfolio-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 500px)  { 
-            .portfolio-grid { column-count: 1; } 
+            .portfolio-grid { grid-template-columns: 1fr; } 
             .content-container { padding: 90px 20px 50px; }
         }
     </style>
@@ -184,155 +185,98 @@
             <h1>PORTFOLIO</h1>
         </div>
 
-        <!-- Cukup tambahkan card baru di sini, layout akan otomatis menyusun 4 kolom ke samping dan turun ke bawah secara otomatis -->
-        <div class="portfolio-grid">
+        <div class="portfolio-grid" id="portfolioGrid">
             
-            <!-- Item 1 (Video) -->
+            <!-- Item 1 -->
             <a href="portf1/" class="portfolio-card">
-                <img src="portf1/port1.png" alt="Minimalist Space" class="portfolio-media"></img> 
+                <img src="portf1/port1.png" alt="Febinda Tito" class="portfolio-media">
                 <div class="portfolio-info">
-                    <div class="portfolio-title">Febinda Tito - Aku Kau Sia Sia (Official Visualizer)</div>
+                    <div class="portfolio-title">Febinda Tito - Aku Kau Sia Sia</div>
                     <div class="portfolio-desc">Music Video Projection Mapping</div>
                 </div>
             </a>
 
-            <!-- Item 2 (Gambar) -->
+            <!-- Item 2 -->
             <a href="portf2/" class="portfolio-card">
-                <img src="portf2/port11.png" alt="Minimalist Space" class="portfolio-media">
+                <img src="portf2/port11.png" alt="Perindu" class="portfolio-media">
                 <div class="portfolio-info">
-                    <div class="portfolio-title">Perindu - Pengagum Rahasia (Official Lyric Video)</div>
+                    <div class="portfolio-title">Perindu - Pengagum Rahasia</div>
                     <div class="portfolio-desc">Music Video Animation</div>
                 </div>
             </a>
 
-            <!-- Item 3 (Video) -->
+            <!-- Item 3 -->
             <a href="portf3/" class="portfolio-card">
-                  <img src="portf3/port111.png" alt="Minimalist Space" class="portfolio-media">
+                <img src="portf3/port111.png" alt="Sutter" class="portfolio-media">
                 <div class="portfolio-info">
-                    <div class="portfolio-title">Sutter - Beri Waktu (Official Visualizer)</div>
+                    <div class="portfolio-title">Sutter - Beri Waktu</div>
                     <div class="portfolio-desc">Music Video Animation</div>
                 </div>
             </a>
 
-            <!-- Item 4 (Gambar) -->
+            <!-- Item 4 -->
             <a href="portf4/" class="portfolio-card">
-                <img src="portf4/kin2.png" alt="Enchanted Forest" class="portfolio-media">
+                <img src="portf4/kin2.png" alt="DJ Kinan" class="portfolio-media">
                 <div class="portfolio-info">
                     <div class="portfolio-title">Official Bumper Opening DJ Kinan</div>
                     <div class="portfolio-desc">Motion DJ Bumper Opening</div>
                 </div>
             </a>
 
-            <!-- Item 4 (Gambar) -->
+            <!-- Item 5 -->
             <a href="portf5/" class="portfolio-card">
-                <img src="portf5/sst2.png" alt="Enchanted Forest" class="portfolio-media">
+                <img src="portf5/sst2.png" alt="Sutter Moonlight" class="portfolio-media">
                 <div class="portfolio-info">
-                    <div class="portfolio-title">Sutter - Moonlight (Official Visualizer)</div>
+                    <div class="portfolio-title">Sutter - Moonlight</div>
                     <div class="portfolio-desc">Music Video Animation</div>
                 </div>
             </a>
 
-                        <!-- Item 4 (Gambar) -->
+            <!-- Item 6 -->
             <a href="/portfolio/detail-4/" class="portfolio-card">
                 <img src="img2.jpg" alt="Enchanted Forest" class="portfolio-media">
                 <div class="portfolio-info">
                     <div class="portfolio-title">Enchanted Forest</div>
-                    <div class="portfolio-desc">Dark atmospheric 3D environment exploration featuring organic particle simulation.</div>
+                    <div class="portfolio-desc">Dark atmospheric 3D environment exploration.</div>
                 </div>
             </a>
-
-               <!-- Item 4 (Gambar) -->
-            <a href="/portfolio/detail-4/" class="portfolio-card">
-                <img src="img2.jpg" alt="Enchanted Forest" class="portfolio-media">
-                <div class="portfolio-info">
-                    <div class="portfolio-title">Enchanted Forest</div>
-                    <div class="portfolio-desc">Dark atmospheric 3D environment exploration featuring organic particle simulation.</div>
-                </div>
-            </a>
-
-               <!-- Item 4 (Gambar) -->
-            <a href="/portfolio/detail-4/" class="portfolio-card">
-                <img src="img2.jpg" alt="Enchanted Forest" class="portfolio-media">
-                <div class="portfolio-info">
-                    <div class="portfolio-title">Enchanted Forest</div>
-                    <div class="portfolio-desc">Dark atmospheric 3D environment exploration featuring organic particle simulation.</div>
-                </div>
-            </a>
-
-               <!-- Item 4 (Gambar) -->
-            <a href="/portfolio/detail-4/" class="portfolio-card">
-                <img src="img2.jpg" alt="Enchanted Forest" class="portfolio-media">
-                <div class="portfolio-info">
-                    <div class="portfolio-title">Enchanted Forest</div>
-                    <div class="portfolio-desc">Dark atmospheric 3D environment exploration featuring organic particle simulation.</div>
-                </div>
-            </a>
-          
 
         </div>
     </div>
 
-    <!-- CDN Three.js & Script Pendukung -->
+    <!-- CDN Three.js & Script Masonry Otomatis -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // OTOMATIS GENERATE THUMBNAIL VIDEO DARI FRAME PERTAMA
-        const allVideos = document.querySelectorAll('video.portfolio-media');
-        allVideos.forEach(video => {
-            video.addEventListener('loadedmetadata', function() {
-                this.currentTime = 0.1;
+        // SCRIPT UNTUK MENGATUR TINGGI DINAMIS TIAP KARTU ALA PINTEREST (GRID SPAN)
+        function resizeGridItem(item) {
+            const grid = document.getElementById('portfolioGrid');
+            const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+            const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
+            const contentHeight = item.querySelector('.portfolio-media').getBoundingClientRect().height;
+            
+            // Menghitung berapa baris grid yang dibutuhkan berdasarkan tinggi asli gambar
+            const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
+            item.style.gridRowEnd = 'span ' + rowSpan;
+        }
+
+        function resizeAllGridItems() {
+            const allItems = document.getElementsByClassName('portfolio-card');
+            for (let i = 0; i < allItems.length; i++) {
+                resizeGridItem(allItems[i]);
+            }
+        }
+
+        window.addEventListener('load', resizeAllGridItems);
+        window.addEventListener('resize', resizeAllGridItems);
+
+        // Menjalankan ulang saat gambar selesai dimuat agar ukuran akurat
+        const allImages = document.querySelectorAll('.portfolio-media');
+        allImages.forEach(img => {
+            img.addEventListener('load', function() {
+                resizeGridItem(this.closest('.portfolio-card'));
             });
-
-            video.addEventListener('seeked', function() {
-                if (!this.getAttribute('poster') && this.videoWidth > 0) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.videoWidth;
-                    canvas.height = this.videoHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-                    this.setAttribute('poster', canvas.toDataURL('image/jpeg', 0.7));
-                }
-            }, { once: true });
         });
-
-        // INSTANT UNLOCK AUDIO ENGINE
-        let audioCtx = null;
-        let isAudioUnlocked = false;
-
-        function unlockAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            if (!isAudioUnlocked && audioCtx.state === 'running') {
-                isAudioUnlocked = true;
-                playTone(440, 0.2, 'sawtooth');
-            }
-        }
-
-        ['click', 'mousedown', 'mouseup', 'keydown', 'touchstart', 'mousemove'].forEach(eventType => {
-            window.addEventListener(eventType, unlockAudio, { once: false });
-        });
-
-        function playTone(freq, duration = 0.12, type = 'sine') {
-            if (!audioCtx || audioCtx.state !== 'running') return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.32, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {
-                console.log(e);
-            }
-        }
 
         // THREE.JS BACKGROUND SCENE
         const scene = new THREE.Scene();
@@ -421,20 +365,11 @@
         const mouse3D = new THREE.Vector3(-9999, -9999, -9999);
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
-        let lastMoveTime = 0;
         window.addEventListener('mousemove', (e) => {
-            unlockAudio();
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             raycaster.ray.intersectPlane(plane, mouse3D);
-
-            const now = Date.now();
-            if (now - lastMoveTime > 140) {
-                const freq = 180 + Math.abs((e.clientX + e.clientY) % 500);
-                playTone(freq, 0.08, 'sine');
-                lastMoveTime = now;
-            }
         });
 
         window.addEventListener('mouseleave', () => {
@@ -473,8 +408,8 @@
                     p.mesh.material.map = p.isRed ? redTexture : whiteTexture;
                 }
 
-                for (let j = i + 1; j < particleCount; j++) {
-                    const p2 = particlesData[j];
+        for (let j = i + 1; j < particleCount; j++) {
+            const p2 = particlesData[j];
                     const dist = p.mesh.position.distanceTo(p2.mesh.position);
                     const connectDistance = 5.2;
 
@@ -513,8 +448,10 @@
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateParser = true;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            resizeAllGridItems();
         });
     </script>
 </body>
