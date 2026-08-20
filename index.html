@@ -141,7 +141,7 @@
 
         const linkData = [
             { name: "ARTWORKS", url: "/artworks/" },
-            { name: "PORTOFOLIO", url: "#" },
+            { name: "PORTOFOLIO", url: "/portfolio" },
             { name: "MOTION ARCHIVE", url: "/archive/" },
             { name: "FREE LOOPS", url: "/free-loops/" },
             { name: "VISUAL ASSET", url: "https://elements.envato.com/user/riduwanvisual" },
@@ -179,6 +179,12 @@
                 a.href = linkData[i].url;
                 a.innerText = linkData[i].name;
                 a.style.pointerEvents = 'auto';
+                
+                // Tambahkan baris ini agar link terbuka di tab baru khusus untuk Envato/VISUAL ASSET
+                if (linkData[i].name === "VISUAL ASSET") {
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                }
 
                 a.addEventListener('mouseenter', () => {
                     unlockAudio();
